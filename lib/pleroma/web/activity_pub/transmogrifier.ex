@@ -339,6 +339,14 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
     end
   end
 
+  # artcafe: transmogrify type back whenever receiving transmogrified artwork from other artcafe
+  # instances
+  defp fix_type(%{"type" => "Note", "is_artwork" => true} = object, options) do
+    object
+    |> Map.put("type", "Artwork")
+    |> Map.delete("is_artwork")
+  end
+
   defp fix_type(object, _options), do: object
 
   # Reduce the object list to find the reported user.
@@ -446,7 +454,7 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
         %{"type" => "Create", "object" => %{"type" => objtype, "id" => obj_id}} = data,
         options
       )
-      when objtype in ~w{Question Answer ChatMessage Audio Video Event Article Note Page Image} do
+      when objtype in ~w{Question Answer ChatMessage Audio Video Event Article Note Page Image Artwork} do
     fetch_options = Keyword.put(options, :depth, (options[:depth] || 0) + 1)
 
     object =
@@ -896,6 +904,14 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
 
   def set_conversation(object) do
     Map.put(object, "conversation", object["context"])
+  end
+
+  # artcafe: for compat reasons, transmogrify an artwork into a note with an extra property
+  # whenever sending artworks
+  def set_type(%{"type" => "Artwork"} = object) do
+    object
+    |> Map.put("type", "Note")
+    |> Map.put("is_artwork", true)
   end
 
   def set_type(%{"type" => "Answer"} = object) do

@@ -63,3 +63,14 @@ Example:
 This setup does not prevent multi-user chats, but these will have to go through
 a `Group`, which will be the recipient of the messages and then `Announce` them
 to the users in the `Group`.
+
+## "Artwork" object type
+
+`Artwork`-type objects are, at the moment, functionally the same as `Note`s. As
+of now, they are a separate type only to distinguish them from normal `Note`s.
+
+To maintain compatibility with other AP servers, they are converted to `Note`s
+with an extra `is_artwork` property when sent, and are converted back to `Artwork`s
+when received.
+
+They are not yet part of any namespace (ooh, that's bad, probably).
