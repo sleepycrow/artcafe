@@ -334,10 +334,28 @@ defmodule Pleroma.Web.MastodonAPI.StatusViewTest do
         emoji_reactions: [],
         parent_visible: false,
         pinned_at: nil
+      },
+      artcafe: %{
+        is_artwork: false
       }
     }
 
     assert status == expected
+    assert_schema(status, "Status", Pleroma.Web.ApiSpec.spec())
+  end
+
+  test "an artwork activity" do
+    note = insert(:artwork_activity)
+    object_data = Object.normalize(note, fetch: false).data
+    user = User.get_cached_by_ap_id(note.data["actor"])
+
+    convo_id = :erlang.crc32(object_data["context"]) |> Bitwise.band(Bitwise.bnot(0x8000_0000))
+
+    status = StatusView.render("show.json", %{activity: note})
+
+    assert Map.has_key?(status, :artcafe)
+    assert Map.has_key?(status.artcafe, :is_artwork)
+    assert status.artcafe.is_artwork == true
     assert_schema(status, "Status", Pleroma.Web.ApiSpec.spec())
   end
 

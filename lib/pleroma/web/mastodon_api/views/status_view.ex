@@ -358,6 +358,8 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
 
     {pinned?, pinned_at} = pin_data(object, user)
 
+    artwork? = (object.data["type"] == "Artwork")
+
     %{
       id: to_string(activity.id),
       uri: object.data["id"],
@@ -406,6 +408,9 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
         emoji_reactions: emoji_reactions,
         parent_visible: visible_for_user?(reply_to, opts[:for]),
         pinned_at: pinned_at
+      },
+      artcafe: %{
+        is_artwork: artwork?
       }
     }
   end

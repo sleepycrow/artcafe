@@ -122,6 +122,34 @@ defmodule Pleroma.Factory do
     }
   end
 
+  def artwork_factory(attrs \\ %{}) do
+    text = sequence(:text, &"This is :moominmamma: note #{&1}")
+
+    user = attrs[:user] || insert(:user)
+
+    data = %{
+      "type" => "Artwork",
+      "content" => text,
+      "source" => text,
+      "id" => Pleroma.Web.ActivityPub.Utils.generate_object_id(),
+      "actor" => user.ap_id,
+      "to" => ["https://www.w3.org/ns/activitystreams#Public"],
+      "published" => DateTime.utc_now() |> DateTime.to_iso8601(),
+      "likes" => [],
+      "like_count" => 0,
+      "context" => "2hu",
+      "summary" => "2hu",
+      "tag" => ["2hu"],
+      "emoji" => %{
+        "2hu" => "corndog.png"
+      }
+    }
+
+    %Pleroma.Object{
+      data: merge_attributes(data, Map.get(attrs, :data, %{}))
+    }
+  end
+
   def attachment_factory(attrs \\ %{}) do
     user = attrs[:user] || insert(:user)
 
@@ -357,6 +385,33 @@ defmodule Pleroma.Factory do
   def note_activity_factory(attrs \\ %{}) do
     user = attrs[:user] || insert(:user)
     note = attrs[:note] || insert(:note, user: user)
+
+    data_attrs = attrs[:data_attrs] || %{}
+    attrs = Map.drop(attrs, [:user, :note, :data_attrs])
+
+    data =
+      %{
+        "id" => Pleroma.Web.ActivityPub.Utils.generate_activity_id(),
+        "type" => "Create",
+        "actor" => note.data["actor"],
+        "to" => note.data["to"],
+        "object" => note.data["id"],
+        "published" => DateTime.utc_now() |> DateTime.to_iso8601(),
+        "context" => note.data["context"]
+      }
+      |> Map.merge(data_attrs)
+
+    %Pleroma.Activity{
+      data: data,
+      actor: data["actor"],
+      recipients: data["to"]
+    }
+    |> Map.merge(attrs)
+  end
+
+  def artwork_activity_factory(attrs \\ %{}) do
+    user = attrs[:user] || insert(:user)
+    note = attrs[:artwork] || insert(:artwork, user: user)
 
     data_attrs = attrs[:data_attrs] || %{}
     attrs = Map.drop(attrs, [:user, :note, :data_attrs])

@@ -40,6 +40,10 @@ Has these additional fields under the `pleroma` object:
 - `parent_visible`: If the parent of this post is visible to the user or not.
 - `pinned_at`: a datetime (iso8601) when status was pinned, `null` otherwise.
 
+Has these additional fields under the `artcafe` object:
+
+- `is_artwork`: `true` if the post is actually not a status, but an Artwork object
+
 The `GET /api/v1/statuses/:id/source` endpoint additionally has the following attributes:
 
 - `content_type`: The content type of the status source.

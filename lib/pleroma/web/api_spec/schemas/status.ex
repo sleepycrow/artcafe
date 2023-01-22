@@ -224,6 +224,15 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Status do
           }
         }
       },
+      artcafe: %Schema{
+        type: :object,
+        properties: %{
+          is_artwork: %Schema{
+            type: :boolean,
+            description: "`true`, if the post is actually not a status, but an Artwork object."
+          },
+        }
+      },
       poll: %Schema{allOf: [Poll], nullable: true, description: "The poll attached to the status"},
       reblog: %Schema{
         allOf: [%OpenApiSpex.Reference{"$ref": "#/components/schemas/Status"}],
@@ -310,6 +319,9 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Status do
           },
           "skip_thread_containment" => false,
           "tags" => []
+        },
+        "artcafe" => %{
+          "is_artwork" => false
         },
         "source" => %{
           "fields" => [],
