@@ -99,7 +99,7 @@ defmodule Pleroma.Web.ActivityPub.ObjectValidators.ArticleNotePageValidator do
 
   defp validate_data(data_cng) do
     data_cng
-    |> validate_inclusion(:type, ["Article", "Note", "Page"])
+    |> validate_inclusion(:type, ["Article", "Note", "Page", "Artwork"])
     |> validate_required([:id, :actor, :attributedTo, :type, :context])
     |> CommonValidations.validate_any_presence([:cc, :to])
     |> CommonValidations.validate_fields_match([:actor, :attributedTo])

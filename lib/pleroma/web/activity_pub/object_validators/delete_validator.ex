@@ -55,6 +55,7 @@ defmodule Pleroma.Web.ActivityPub.ObjectValidators.DeleteValidator do
     Question
     Tombstone
     Video
+    Artwork
   }
   defp validate_data(cng) do
     cng
