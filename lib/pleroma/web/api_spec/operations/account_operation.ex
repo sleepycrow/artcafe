@@ -159,6 +159,53 @@ defmodule Pleroma.Web.ApiSpec.AccountOperation do
     }
   end
 
+  def artworks_operation do
+    %Operation{
+      summary: "Artworks",
+      tags: ["Retrieve account information"],
+      operationId: "AccountController.artworks",
+      description:
+        "Artworks posted by the given account. Public (for public artworks only), or user token + `read:statuses` (for private artworks the user is authorized to see)",
+      parameters:
+        [
+          %Reference{"$ref": "#/components/parameters/accountIdOrNickname"},
+          Operation.parameter(:pinned, :query, BooleanLike, "Include only pinned statuses"),
+          Operation.parameter(:tagged, :query, :string, "With tag"),
+          Operation.parameter(
+            :only_media,
+            :query,
+            BooleanLike,
+            "Include only statuses with media attached"
+          ),
+          Operation.parameter(
+            :with_muted,
+            :query,
+            BooleanLike,
+            "Include statuses from muted accounts."
+          ),
+          Operation.parameter(:exclude_reblogs, :query, BooleanLike, "Exclude reblogs"),
+          Operation.parameter(:exclude_replies, :query, BooleanLike, "Exclude replies"),
+          Operation.parameter(
+            :exclude_visibilities,
+            :query,
+            %Schema{type: :array, items: VisibilityScope},
+            "Exclude visibilities"
+          ),
+          Operation.parameter(
+            :with_muted,
+            :query,
+            BooleanLike,
+            "Include reactions from muted accounts."
+          )
+        ] ++ pagination_params(),
+      responses: %{
+        200 => Operation.response("Statuses", "application/json", array_of_statuses()),
+        401 => Operation.response("Error", "application/json", ApiError),
+        404 => Operation.response("Error", "application/json", ApiError)
+      }
+    }
+  end
+
   def followers_operation do
     %Operation{
       tags: ["Retrieve account information"],

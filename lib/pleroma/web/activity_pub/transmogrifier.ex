@@ -341,7 +341,7 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
 
   # artcafe: transmogrify type back whenever receiving transmogrified artwork from other artcafe
   # instances
-  defp fix_type(%{"type" => "Note", "is_artwork" => true} = object, options) do
+  defp fix_type(%{"type" => "Note", "is_artwork" => true} = object, _options) do
     object
     |> Map.put("type", "Artwork")
     |> Map.delete("is_artwork")

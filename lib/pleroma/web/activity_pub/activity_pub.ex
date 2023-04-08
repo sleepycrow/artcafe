@@ -962,6 +962,22 @@ defmodule Pleroma.Web.ActivityPub.ActivityPub do
 
   defp restrict_media(query, _), do: query
 
+  defp restrict_object_type(query, %{include_object_type: type}) do
+    from(
+      [_activity, object] in query,
+      where: fragment("?->>'type' = ?", object.data, ^type)
+    )
+  end
+
+  defp restrict_object_type(query, %{exclude_object_type: type}) do
+    from(
+      [_activity, object] in query,
+      where: fragment("?->>'type' != ?", object.data, ^type)
+    )
+  end
+
+  defp restrict_object_type(query, _), do: query
+
   defp restrict_replies(query, %{exclude_replies: true}) do
     from(
       [_activity, object] in query,
@@ -1391,6 +1407,7 @@ defmodule Pleroma.Web.ActivityPub.ActivityPub do
       |> restrict_muted(restrict_muted_opts)
       |> restrict_filtered(opts)
       |> restrict_media(opts)
+      |> restrict_object_type(opts)
       |> restrict_visibility(opts)
       |> restrict_thread_visibility(opts, config)
       |> restrict_reblogs(opts)

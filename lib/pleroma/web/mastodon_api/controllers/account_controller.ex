@@ -337,6 +337,32 @@ defmodule Pleroma.Web.MastodonAPI.AccountController do
     end
   end
 
+  @doc "GET /api/v1/accounts/:id/artwork"
+  def artworks(%{assigns: %{user: reading_user}} = conn, params) do
+    with %User{} = user <- User.get_cached_by_nickname_or_id(params.id, for: reading_user),
+         :visible <- User.visible_for(user, reading_user) do
+      params =
+        params
+        |> Map.delete(:tagged)
+        |> Map.put(:tag, params[:tagged])
+        |> Map.put(:include_object_type, "Artwork")
+
+      activities = ActivityPub.fetch_user_activities(user, reading_user, params)
+
+      conn
+      |> add_link_headers(activities)
+      |> put_view(StatusView)
+      |> render("index.json",
+        activities: activities,
+        for: reading_user,
+        as: :activity,
+        with_muted: Map.get(params, :with_muted, false)
+      )
+    else
+      error -> user_visibility_error(conn, error)
+    end
+  end
+
   defp user_visibility_error(conn, error) do
     case error do
       :restrict_unauthenticated ->
