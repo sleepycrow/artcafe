@@ -125,6 +125,12 @@ defmodule Pleroma.Web.ApiSpec.AccountOperation do
           Operation.parameter(:pinned, :query, BooleanLike, "Include only pinned statuses"),
           Operation.parameter(:tagged, :query, :string, "With tag"),
           Operation.parameter(
+            :include_object_types,
+            :query,
+            %Schema{type: :array, items: %Schema{type: :string}},
+            "Look for objects of types"
+          ),
+          Operation.parameter(
             :only_media,
             :query,
             BooleanLike,
