@@ -741,7 +741,6 @@ defmodule Pleroma.Web.Router do
 
     get("/accounts/lookup", AccountController, :lookup)
 
-    get("/accounts/:id/artwork", AccountController, :artworks)
     get("/accounts/:id/statuses", AccountController, :statuses)
     get("/accounts/:id/followers", AccountController, :followers)
     get("/accounts/:id/following", AccountController, :following)
