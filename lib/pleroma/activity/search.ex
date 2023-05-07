@@ -18,6 +18,7 @@ defmodule Pleroma.Activity.Search do
     limit = Enum.min([Keyword.get(options, :limit), 40])
     offset = Keyword.get(options, :offset, 0)
     author = Keyword.get(options, :author)
+    types = Keyword.get(options, :include_object_types)
 
     search_function =
       if :persistent_term.get({Pleroma.Repo, :postgres_version}) >= 11 do
@@ -35,6 +36,7 @@ defmodule Pleroma.Activity.Search do
       |> maybe_restrict_local(user)
       |> maybe_restrict_author(author)
       |> maybe_restrict_blocked(user)
+      |> maybe_restrict_object_types(types)
       |> Pagination.fetch_paginated(
         %{"offset" => offset, "limit" => limit, "skip_order" => index_type == :rum},
         :offset
@@ -75,6 +77,13 @@ defmodule Pleroma.Activity.Search do
       where: ^Pleroma.Constants.as_public() in a.recipients
     )
   end
+
+  def maybe_restrict_object_types(query, types)
+      when is_list(types) do
+    Activity.Queries.by_ap_types(query, types)
+  end
+
+  def maybe_restrict_object_types(query, _), do: query
 
   defp query_with(q, :gin, search_query, :plain) do
     %{rows: [[tsc]]} =

@@ -158,10 +158,15 @@ defmodule Pleroma.Web.ApiSpec.SearchOperation do
           items: Account,
           description: "Accounts which match the given query"
         },
+        artworks: %Schema{
+          type: :array,
+          items: Status,
+          description: "Artwork statuses that match the given query"
+        },
         statuses: %Schema{
           type: :array,
           items: Status,
-          description: "Statuses which match the given query"
+          description: "Statuses of all types which match the given query"
         },
         hashtags: %Schema{
           type: :array,

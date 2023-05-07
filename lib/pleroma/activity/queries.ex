@@ -37,6 +37,22 @@ defmodule Pleroma.Activity.Queries do
     from(a in query, where: a.actor == ^ap_id)
   end
 
+  @spec by_ap_types(query, [String.t()], keyword()) :: query
+  def by_ap_types(query, types, opts \\ []) do
+    query =
+      if opts[:skip_preloading] do
+        Activity.with_joined_object(query)
+      else
+        Activity.with_preloaded_object(query)
+      end
+
+    where(
+      query,
+      [activity, object: o],
+      fragment("(?)->>'type' = ANY (?)", o.data, ^types)
+    )
+  end
+
   def find_by_object_ap_id(activities, object_ap_id) do
     Enum.find(
       activities,
