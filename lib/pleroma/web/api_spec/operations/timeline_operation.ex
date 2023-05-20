@@ -29,6 +29,7 @@ defmodule Pleroma.Web.ApiSpec.TimelineOperation do
         only_media_param(),
         with_muted_param(),
         exclude_visibilities_param(),
+        include_object_types(),
         reply_visibility_param() | pagination_params()
       ],
       operationId: "TimelineController.home",
@@ -65,6 +66,7 @@ defmodule Pleroma.Web.ApiSpec.TimelineOperation do
         remote_param(),
         with_muted_param(),
         exclude_visibilities_param(),
+        include_object_types(),
         reply_visibility_param() | pagination_params()
       ],
       operationId: "TimelineController.public",
@@ -111,6 +113,7 @@ defmodule Pleroma.Web.ApiSpec.TimelineOperation do
         only_media_param(),
         remote_param(),
         with_muted_param(),
+        include_object_types(),
         exclude_visibilities_param() | pagination_params()
       ],
       operationId: "TimelineController.hashtag",
@@ -139,6 +142,7 @@ defmodule Pleroma.Web.ApiSpec.TimelineOperation do
         local_param(),
         remote_param(),
         only_media_param(),
+        include_object_types(),
         exclude_visibilities_param() | pagination_params()
       ],
       operationId: "TimelineController.list",
@@ -146,6 +150,15 @@ defmodule Pleroma.Web.ApiSpec.TimelineOperation do
         200 => Operation.response("Array of Status", "application/json", array_of_statuses())
       }
     }
+  end
+
+  defp include_object_types do
+    Operation.parameter(
+      :include_object_types,
+      :query,
+      %Schema{type: :array, items: %Schema{type: :string}},
+      "Look for objects of types"
+    )
   end
 
   defp array_of_statuses do
