@@ -49,7 +49,7 @@ defmodule Pleroma.Web.MastodonAPI.SearchController do
     query = String.trim(query)
     options = search_options(params, user)
     timeout = Keyword.get(Repo.config(), :timeout, 15_000)
-    default_values = %{"statuses" => [], "accounts" => [], "hashtags" => [], "artworks" => []}
+    default_values = %{"statuses" => [], "accounts" => [], "hashtags" => []}
 
     result =
       default_values
@@ -84,7 +84,8 @@ defmodule Pleroma.Web.MastodonAPI.SearchController do
       type: params[:type],
       author: get_author(params),
       embed_relationships: ControllerHelper.embed_relationships?(params),
-      for_user: user
+      for_user: user,
+      include_object_types: params[:include_object_types]
     ]
     |> Enum.filter(&elem(&1, 1))
   end
@@ -101,20 +102,6 @@ defmodule Pleroma.Web.MastodonAPI.SearchController do
 
   defp resource_search(_, "statuses", query, options) do
     statuses = with_fallback(fn -> Activity.search(options[:for_user], query, options) end)
-
-    StatusView.render("index.json",
-      activities: statuses,
-      for: options[:for_user],
-      as: :activity
-    )
-  end
-
-  defp resource_search(_, "artworks", query, options) do
-    statuses = with_fallback(fn -> Activity.search(
-      options[:for_user],
-      query,
-      options ++ [include_object_types: ["Artwork"]]
-    ) end)
 
     StatusView.render("index.json",
       activities: statuses,

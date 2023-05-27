@@ -140,6 +140,12 @@ defmodule Pleroma.Web.ApiSpec.SearchOperation do
           %Schema{allOf: [BooleanLike], default: false},
           "Only include accounts that the user is following"
         ),
+        Operation.parameter(
+          :include_object_types,
+          :query,
+          %Schema{type: :array, items: %Schema{type: :string}},
+          "Only include statuses of given object types"
+        ),
         with_relationships_param() | pagination_params()
       ],
       responses: %{
@@ -157,11 +163,6 @@ defmodule Pleroma.Web.ApiSpec.SearchOperation do
           type: :array,
           items: Account,
           description: "Accounts which match the given query"
-        },
-        artworks: %Schema{
-          type: :array,
-          items: Status,
-          description: "Artwork statuses that match the given query"
         },
         statuses: %Schema{
           type: :array,
