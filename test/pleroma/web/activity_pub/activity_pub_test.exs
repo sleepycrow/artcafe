@@ -1160,6 +1160,41 @@ defmodule Pleroma.Web.ActivityPub.ActivityPubTest do
     assert activity == expected_activity
   end
 
+  describe "object type filtering" do
+    setup do
+      user = insert(:user)
+
+      {:ok, note_activity} = ActivityBuilder.insert(%{"type" => "Create"}, %{:user => user, :obj_type => "Note"})
+      {:ok, artwork_activity} = ActivityBuilder.insert(%{"type" => "Create"}, %{:user => user, :obj_type => "Artwork"})
+      {:ok, question_activity} = ActivityBuilder.insert(%{"type" => "Create"}, %{:user => user, :obj_type => "Question"})
+
+      {:ok, %{
+        user: user,
+        note_activity: note_activity,
+        artwork_activity: artwork_activity,
+        question_activity: question_activity
+      }}
+    end
+
+    test "includes only the specified types, if include_object_types is set", %{
+      user: user,
+      artwork_activity: artwork_activity
+    } do
+      [activity] = ActivityPub.fetch_user_activities(user, nil, %{include_object_types: ["Artwork"]})
+
+      assert activity == artwork_activity
+    end
+
+    test "excludes the non-specified types, if exclude_object_types is set", %{
+      user: user,
+      note_activity: note_activity
+    } do
+      [activity] = ActivityPub.fetch_user_activities(user, nil, %{exclude_object_types: ["Question", "Artwork"]})
+
+      assert activity == note_activity
+    end
+  end
+
   describe "irreversible filters" do
     setup do
       user = insert(:user)

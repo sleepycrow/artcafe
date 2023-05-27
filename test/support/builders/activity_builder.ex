@@ -7,6 +7,7 @@ defmodule Pleroma.Builders.ActivityBuilder do
 
   def build(data \\ %{}, opts \\ %{}) do
     user = opts[:user] || Pleroma.Factory.insert(:user)
+    obj_type = opts[:obj_type] || "Note"
 
     activity = %{
       "id" => Pleroma.Web.ActivityPub.Utils.generate_object_id(),
@@ -14,7 +15,7 @@ defmodule Pleroma.Builders.ActivityBuilder do
       "to" => ["https://www.w3.org/ns/activitystreams#Public"],
       "type" => "Create",
       "object" => %{
-        "type" => "Note",
+        "type" => obj_type,
         "content" => "test",
         "to" => ["https://www.w3.org/ns/activitystreams#Public"]
       }
