@@ -974,7 +974,7 @@ defmodule Pleroma.Web.ActivityPub.ActivityPub do
        when is_list(types) do
     from(
       [_activity, object] in query,
-      where: fragment("?->>'type' != ANY (?)", object.data, ^types)
+      where: fragment("?->>'type' != ALL (?)", object.data, ^types)
     )
   end
 
