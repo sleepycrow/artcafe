@@ -125,6 +125,24 @@ defmodule Pleroma.Web.MastodonAPI.SearchControllerTest do
       assert [] = results["statuses"]
     end
 
+    test "limit statuses by object type" do
+      user = insert(:user)
+      %{conn: conn} = oauth_access(["read:search"])
+
+      {:ok, activity} =
+        CommonAPI.post(user, %{status: "haha possum picture", is_artwork: true})
+      {:ok, _other_activity} =
+        CommonAPI.post(user, %{status: "haha i hate myself haha :("})
+
+      results =
+        conn
+        |> get("/api/v2/search?q=haha&include_object_types[]=Artwork")
+        |> json_response_and_validate_schema(200)
+
+      [status] = results["statuses"]
+      assert status["id"] == to_string(activity.id)
+    end
+
     @tag capture_log: true
     test "constructs hashtags from search query", %{conn: conn} do
       results =

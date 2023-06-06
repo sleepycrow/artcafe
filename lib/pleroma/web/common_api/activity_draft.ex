@@ -24,7 +24,7 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
             in_reply_to_conversation: nil,
             visibility: nil,
             expires_at: nil,
-            extra: nil,
+            extra: %{},
             emoji: %{},
             content_html: nil,
             mentions: [],
@@ -50,7 +50,7 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
     |> with_valid(&attachments/1)
     |> full_payload()
     |> expires_at()
-    |> poll()
+    |> extra()
     |> with_valid(&in_reply_to/1)
     |> with_valid(&in_reply_to_conversation/1)
     |> with_valid(&visibility/1)
@@ -154,6 +154,19 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
     end
   end
 
+  defp extra(%{params: params} = draft) do
+    case params do
+      %{is_artwork: true} ->
+        artwork(draft)
+
+      %{poll: _} ->
+        poll(draft)
+
+      _ ->
+        draft
+    end
+  end
+
   defp poll(draft) do
     case Utils.make_poll_data(draft.params) do
       {:ok, {poll, poll_emoji}} ->
@@ -162,6 +175,10 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
       {:error, message} ->
         add_error(draft, message)
     end
+  end
+
+  defp artwork(draft) do
+    %__MODULE__{draft | extra: %{"type" => "Artwork"}}
   end
 
   defp content(draft) do
