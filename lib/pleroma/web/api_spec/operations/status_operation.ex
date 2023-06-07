@@ -581,7 +581,12 @@ defmodule Pleroma.Web.ApiSpec.StatusOperation do
           type: :string,
           description:
             "Will reply to a given conversation, addressing only the people who are part of the recipient set of that conversation. Sets the visibility to `direct`."
-        }
+        },
+        is_artwork: %Schema{
+          allOf: [BooleanLike],
+          nullable: true,
+          description: "Whether the status should be marked as an Artwork-type status. If set to `true`, at least one media attachment is required."
+        },
       },
       example: %{
         "status" => "What time is it?",

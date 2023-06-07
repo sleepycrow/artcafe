@@ -494,4 +494,15 @@ defmodule Pleroma.Web.CommonAPI.Utils do
       {:error, dgettext("errors", "Too many attachments")}
     end
   end
+
+  def validate_artwork_type(extra, attachments) do
+    is_artwork = Map.get(extra, "type") == "Artwork"
+    has_media = is_list(attachments) and length(attachments) > 0
+
+    if not is_artwork or (is_artwork and has_media) do
+      :ok
+    else
+      {:error, dgettext("errors", "Artwork statuses must have media attachments")}
+    end
+  end
 end

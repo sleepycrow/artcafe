@@ -178,7 +178,12 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
   end
 
   defp artwork(draft) do
-    %__MODULE__{draft | extra: %{"type" => "Artwork"}}
+    draft = %__MODULE__{draft | extra: %{"type" => "Artwork"}}
+
+    case Utils.validate_artwork_type(draft.extra, draft.attachments) do
+      :ok -> draft
+      {:error, message} -> add_error(draft, message)
+    end
   end
 
   defp content(draft) do
