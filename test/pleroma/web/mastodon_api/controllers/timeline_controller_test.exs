@@ -149,6 +149,51 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
              |> get("/api/v1/timelines/home?remote=true&local=true")
              |> json_response_and_validate_schema(200) == []
     end
+
+    test "filtering by object type", %{conn: conn, user: user} do
+      {:ok, %{id: note_post_id}} = CommonAPI.post(user, %{status: "I accidentally"})
+      {:ok, %{id: poll_post_id}} = CommonAPI.post(user, %{
+        status: "what do you think???",
+        poll: %{
+          options: ["yea", "3"],
+          expires_in: 2137
+        }
+      })
+
+      without_filter_ids =
+        conn
+        |> get("/api/v1/timelines/home")
+        |> json_response_and_validate_schema(200)
+        |> Enum.map(& &1["id"])
+
+      assert note_post_id in without_filter_ids
+      assert poll_post_id in without_filter_ids
+
+      only_note_ids =
+        conn
+        |> get("/api/v1/timelines/home?include_object_types[]=Note")
+        |> json_response_and_validate_schema(200)
+        |> Enum.map(& &1["id"])
+
+      assert note_post_id in only_note_ids
+      refute poll_post_id in only_note_ids
+
+      only_poll_ids =
+        conn
+        |> get("/api/v1/timelines/home?include_object_types[]=Question")
+        |> json_response_and_validate_schema(200)
+        |> Enum.map(& &1["id"])
+
+      refute note_post_id in only_poll_ids
+      assert poll_post_id in only_poll_ids
+
+      only_artwork_ids =
+        conn
+        |> get("/api/v1/timelines/home?include_object_types[]=Artwork")
+        |> json_response_and_validate_schema(200)
+
+      assert only_artwork_ids == []
+    end
   end
 
   describe "public" do

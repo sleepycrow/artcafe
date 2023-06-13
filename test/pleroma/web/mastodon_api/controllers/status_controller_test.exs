@@ -755,6 +755,44 @@ defmodule Pleroma.Web.MastodonAPI.StatusControllerTest do
     end
   end
 
+  describe "posting artworks" do
+    setup do: oauth_access(["write:statuses"])
+
+    test "posting an artwork", %{user: user, conn: conn} do
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+
+      {:ok, upload} = ActivityPub.upload(file, actor: user.ap_id)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/statuses", %{
+          "status" => "warrior cat",
+          "is_artwork" => "true",
+          "media_ids" => [to_string(upload.id)]
+        })
+
+      assert json_response_and_validate_schema(conn, 200)
+    end
+
+    test "fails if no media attachments are given", %{conn: conn} do
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/statuses", %{
+          "status" => "no warrior cat :(",
+          "is_artwork" => "true"
+        })
+      response = json_response_and_validate_schema(conn, 422)
+
+      assert %{"error" => "Artwork statuses must have media attachments"} = response
+    end
+  end
+
   test "get a status" do
     %{conn: conn} = oauth_access(["read:statuses"])
     activity = insert(:note_activity)

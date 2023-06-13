@@ -464,6 +464,36 @@ defmodule Pleroma.Web.MastodonAPI.AccountControllerTest do
       assert [%{"id" => ^post_id}] = json_response_and_validate_schema(conn, 200)
     end
 
+    test "filters posts by type", %{conn: conn} do
+      user = insert(:user)
+
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+      {:ok, %{id: media_id}} = ActivityPub.upload(file, actor: user.ap_id)
+
+      {:ok, %{id: artwork_post_id}} = CommonAPI.post(user, %{status: "llvm dragon voring gnu stallman", media_ids: [media_id], is_artwork: true})
+      {:ok, %{id: note_post_id}} = CommonAPI.post(user, %{status: "I accidentally"})
+      {:ok, %{id: poll_post_id}} = CommonAPI.post(user, %{
+        status: "what do you think???",
+        poll: %{
+          options: ["yea", "3"],
+          expires_in: 2137
+        }
+      })
+
+      conn = get(conn, "/api/v1/accounts/#{user.id}/statuses?include_object_types[]=Artwork")
+      assert [%{"id" => ^artwork_post_id}] = json_response_and_validate_schema(conn, 200)
+
+      conn = get(conn, "/api/v1/accounts/#{user.id}/statuses?include_object_types[]=Note")
+      assert [%{"id" => ^note_post_id}] = json_response_and_validate_schema(conn, 200)
+
+      conn = get(conn, "/api/v1/accounts/#{user.id}/statuses?include_object_types[]=Question")
+      assert [%{"id" => ^poll_post_id}] = json_response_and_validate_schema(conn, 200)
+    end
+
     test "filters user's statuses by a hashtag", %{user: user, conn: conn} do
       {:ok, %{id: post_id}} = CommonAPI.post(user, %{status: "#hashtag"})
       {:ok, _post} = CommonAPI.post(user, %{status: "hashtag"})
