@@ -8,6 +8,7 @@ defmodule Pleroma.Web.MastodonAPI.SearchControllerTest do
   alias Pleroma.Object
   alias Pleroma.Web.CommonAPI
   alias Pleroma.Web.Endpoint
+  alias Pleroma.Web.ActivityPub.ActivityPub
   import Pleroma.Factory
   import ExUnit.CaptureLog
   import Tesla.Mock
@@ -129,8 +130,15 @@ defmodule Pleroma.Web.MastodonAPI.SearchControllerTest do
       user = insert(:user)
       %{conn: conn} = oauth_access(["read:search"])
 
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+      {:ok, %{id: media_id}} = ActivityPub.upload(file, actor: user.ap_id)
+
       {:ok, activity} =
-        CommonAPI.post(user, %{status: "haha possum picture", is_artwork: true})
+        CommonAPI.post(user, %{status: "haha possum picture", media_ids: [media_id], is_artwork: true})
       {:ok, _other_activity} =
         CommonAPI.post(user, %{status: "haha i hate myself haha :("})
 
