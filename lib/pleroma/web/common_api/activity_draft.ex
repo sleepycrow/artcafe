@@ -156,7 +156,7 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
 
   defp extra(%{params: params} = draft) do
     case params do
-      %{is_artwork: true} ->
+      %{artwork: _} ->
         artwork(draft)
 
       %{poll: _} ->
@@ -177,12 +177,14 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
     end
   end
 
-  defp artwork(draft) do
-    draft = %__MODULE__{draft | extra: %{"type" => "Artwork"}}
+  defp artwork(%{params: %{artwork: artwork_params}} = draft) do
+    case Utils.make_artwork_data(artwork_params, draft.attachments) do
+      {:ok, artwork_data} ->
+        IO.inspect artwork_data
+        %__MODULE__{draft | extra: artwork_data}
 
-    case Utils.validate_artwork_type(draft.extra, draft.attachments) do
-      :ok -> draft
-      {:error, message} -> add_error(draft, message)
+      {:error, message} ->
+        add_error(draft, message)
     end
   end
 

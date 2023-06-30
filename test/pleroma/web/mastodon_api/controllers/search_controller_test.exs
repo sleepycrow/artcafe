@@ -138,7 +138,7 @@ defmodule Pleroma.Web.MastodonAPI.SearchControllerTest do
       {:ok, %{id: media_id}} = ActivityPub.upload(file, actor: user.ap_id)
 
       {:ok, activity} =
-        CommonAPI.post(user, %{status: "haha possum picture", media_ids: [media_id], is_artwork: true})
+        CommonAPI.post(user, %{status: "haha possum picture", media_ids: [media_id], artwork: %{title: "oh possum haha"}})
       {:ok, _other_activity} =
         CommonAPI.post(user, %{status: "haha i hate myself haha :("})
 

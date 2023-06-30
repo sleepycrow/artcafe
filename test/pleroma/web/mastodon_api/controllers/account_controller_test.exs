@@ -474,7 +474,7 @@ defmodule Pleroma.Web.MastodonAPI.AccountControllerTest do
       }
       {:ok, %{id: media_id}} = ActivityPub.upload(file, actor: user.ap_id)
 
-      {:ok, %{id: artwork_post_id}} = CommonAPI.post(user, %{status: "llvm dragon voring gnu stallman", media_ids: [media_id], is_artwork: true})
+      {:ok, %{id: artwork_post_id}} = CommonAPI.post(user, %{status: "llvm dragon voring gnu stallman", media_ids: [media_id], artwork: %{title: "the dragon and the bride"}})
       {:ok, %{id: note_post_id}} = CommonAPI.post(user, %{status: "I accidentally"})
       {:ok, %{id: poll_post_id}} = CommonAPI.post(user, %{
         status: "what do you think???",

@@ -772,7 +772,7 @@ defmodule Pleroma.Web.MastodonAPI.StatusControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/v1/statuses", %{
           "status" => "warrior cat",
-          "is_artwork" => "true",
+          "artwork" => %{"title" => "epic warrior fanart cats"},
           "media_ids" => [to_string(upload.id)]
         })
 
@@ -785,7 +785,7 @@ defmodule Pleroma.Web.MastodonAPI.StatusControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/v1/statuses", %{
           "status" => "no warrior cat :(",
-          "is_artwork" => "true"
+          "artwork" => %{"title" => "nothing :DD"}
         })
       response = json_response_and_validate_schema(conn, 422)
 

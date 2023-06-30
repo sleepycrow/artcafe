@@ -582,11 +582,7 @@ defmodule Pleroma.Web.ApiSpec.StatusOperation do
           description:
             "Will reply to a given conversation, addressing only the people who are part of the recipient set of that conversation. Sets the visibility to `direct`."
         },
-        is_artwork: %Schema{
-          allOf: [BooleanLike],
-          nullable: true,
-          description: "Whether the status should be marked as an Artwork-type status. If set to `true`, at least one media attachment is required."
-        },
+        artwork: artwork_params()
       },
       example: %{
         "status" => "What time is it?",
@@ -679,6 +675,21 @@ defmodule Pleroma.Web.ApiSpec.StatusOperation do
           allOf: [BooleanLike],
           nullable: true,
           description: "Hide vote counts until the poll ends?"
+        }
+      }
+    }
+  end
+
+  def artwork_params do
+    %Schema{
+      nullable: true,
+      type: :object,
+      required: [:title],
+      properties: %{
+        title: %Schema{
+          type: :string,
+          nullable: true,
+          description: "The title of the artwork."
         }
       }
     }

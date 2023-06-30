@@ -495,14 +495,20 @@ defmodule Pleroma.Web.CommonAPI.Utils do
     end
   end
 
-  def validate_artwork_type(extra, attachments) do
-    is_artwork = Map.get(extra, "type") == "Artwork"
-    has_media = is_list(attachments) and length(attachments) > 0
+  def make_artwork_data(_artwork_params, [] = _attachments) do
+    {:error, dgettext("errors", "Artwork statuses must have media attachments")}
+  end
 
-    if not is_artwork or (is_artwork and has_media) do
-      :ok
-    else
-      {:error, dgettext("errors", "Artwork statuses must have media attachments")}
-    end
+  def make_artwork_data(%{title: title} = _artwork_params, attachments) when is_list(attachments) do
+    IO.inspect("-----> INVOKED BASED CLAUSE")
+    {:ok, %{
+      "type" => "Artwork",
+      "name" => title
+    }}
+  end
+
+  def make_artwork_data(_, _) do
+    IO.inspect("-----> INVOKED SHIT CLAUSE")
+    {:ok, %{}}
   end
 end
