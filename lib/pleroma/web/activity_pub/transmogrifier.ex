@@ -339,12 +339,12 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
     end
   end
 
-  # artcafe: transmogrify type back whenever receiving transmogrified artwork from other artcafe
-  # instances
-  defp fix_type(%{"type" => "Note", "is_artwork" => true} = object, _options) do
+  # artcafe: transmogrify note-compatible custom objects (e.g. Artwork) back into their intended
+  # types whenever receiving such objects
+  defp fix_type(%{"type" => "Note", "intendedType" => "Artwork"} = object, _options) do
     object
     |> Map.put("type", "Artwork")
-    |> Map.delete("is_artwork")
+    |> Map.delete("intendedType")
   end
 
   defp fix_type(object, _options), do: object
@@ -906,12 +906,12 @@ defmodule Pleroma.Web.ActivityPub.Transmogrifier do
     Map.put(object, "conversation", object["context"])
   end
 
-  # artcafe: for compat reasons, transmogrify an artwork into a note with an extra property
-  # whenever sending artworks
+  # artcafe: for compat reasons, transmogrify a custom, note-compatible objects (e.g. Artwork) into
+  # a note with an extra "intendedType" property
   def set_type(%{"type" => "Artwork"} = object) do
     object
     |> Map.put("type", "Note")
-    |> Map.put("is_artwork", true)
+    |> Map.put("intendedType", "Artwork")
   end
 
   def set_type(%{"type" => "Answer"} = object) do

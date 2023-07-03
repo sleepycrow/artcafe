@@ -1,0 +1,54 @@
+{
+    "@context": [
+        "https://www.w3.org/ns/activitystreams",
+        "http://192.168.0.212/schemas/litepub-0.1.jsonld",
+        {
+            "@language": "und"
+        }
+    ],
+    "actor": "http://192.168.0.212/users/admin",
+    "cc": [
+        "http://192.168.0.212/users/admin/followers"
+    ],
+    "context": "http://192.168.0.212/contexts/439cce5f-78d4-4a31-9142-19bb3b19f993",
+    "directMessage": false,
+    "id": "http://192.168.0.212/activities/9fe487d6-4df7-4702-851b-82c7b0989c20",
+    "object": {
+        "actor": "http://192.168.0.212/users/admin",
+        "attachment": [
+            {
+                "mediaType": "image/png",
+                "name": "",
+                "type": "Document",
+                "url": "http://192.168.0.212/media/0b71bad8575476a854d0067b48245bc828bfc9a67970d7c012017a4ce742c2b1.png"
+            }
+        ],
+        "attributedTo": "http://192.168.0.212/users/admin",
+        "cc": [
+            "http://192.168.0.212/users/admin/followers"
+        ],
+        "content": "hiya nerds",
+        "context": "http://192.168.0.212/contexts/439cce5f-78d4-4a31-9142-19bb3b19f993",
+        "conversation": "http://192.168.0.212/contexts/439cce5f-78d4-4a31-9142-19bb3b19f993",
+        "id": "http://192.168.0.212/objects/ed48a84f-96fa-43ac-b9b6-6c1d4788e03b",
+        "name": "nerd image",
+        "intendedType": "Artwork",
+        "published": "2023-07-02T22:14:33.179541Z",
+        "sensitive": null,
+        "source": {
+            "content": "hiya nerds",
+            "mediaType": "text/plain"
+        },
+        "summary": "",
+        "tag": [],
+        "to": [
+            "https://www.w3.org/ns/activitystreams#Public"
+        ],
+        "type": "Note"
+    },
+    "published": "2023-07-02T22:14:33.179515Z",
+    "to": [
+        "https://www.w3.org/ns/activitystreams#Public"
+    ],
+    "type": "Create"
+}

@@ -70,7 +70,7 @@ to the users in the `Group`.
 of now, they are a separate type only to distinguish them from normal `Note`s.
 
 To maintain compatibility with other AP servers, they are converted to `Note`s
-with an extra `is_artwork` property when sent, and are converted back to `Artwork`s
-when received.
+with an extra `intendedType: Artwork` key-value pair when sent, and are converted
+back to `Artwork`s when received.
 
 They are not yet part of any namespace (ooh, that's bad, probably).

@@ -9,6 +9,7 @@ defmodule Pleroma.Web.ActivityPub.TransmogrifierTest do
   alias Pleroma.Activity
   alias Pleroma.Object
   alias Pleroma.User
+  alias Pleroma.Web.ActivityPub.ActivityPub
   alias Pleroma.Web.ActivityPub.Transmogrifier
   alias Pleroma.Web.ActivityPub.Utils
   alias Pleroma.Web.AdminAPI.AccountView
@@ -135,6 +136,21 @@ defmodule Pleroma.Web.ActivityPub.TransmogrifierTest do
 
       tag = object.data["tag"] |> List.first()
       assert tag["type"] == "Mention"
+    end
+
+    test "it properly handles Note activities with the intendedType of Artwork" do
+      insert(:user, ap_id: "http://192.168.0.212/users/admin")
+
+      incoming =
+        "test/fixtures/create-note-with-intendedType-artwork.json"
+        |> File.read!()
+        |> Jason.decode!()
+
+      assert {:ok, %Activity{} = activity} = Transmogrifier.handle_incoming(incoming)
+
+      object = Object.normalize(activity, fetch: false)
+
+      assert object.data["type"] == "Artwork"
     end
   end
 
@@ -349,6 +365,25 @@ defmodule Pleroma.Web.ActivityPub.TransmogrifierTest do
                  ]
                }
              } = prepared["object"]
+    end
+
+    test "it transforms Artwork type objects into Note objects with the appropriate intendedType" do
+      user = insert(:user)
+
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+      {:ok, %{id: media_id}} = ActivityPub.upload(file, actor: user.ap_id)
+
+      {:ok, activity} =
+        CommonAPI.post(user, %{status: "haha possum picture", media_ids: [media_id], artwork: %{title: "oh possum haha"}})
+
+      {:ok, outgoing} = Transmogrifier.prepare_outgoing(activity.data)
+
+      assert outgoing["object"]["type"] == "Note"
+      assert outgoing["object"]["intendedType"] == "Artwork"
     end
   end
 
