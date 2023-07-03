@@ -180,7 +180,6 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
   defp artwork(%{params: %{artwork: artwork_params}} = draft) do
     case Utils.make_artwork_data(artwork_params, draft.attachments) do
       {:ok, artwork_data} ->
-        IO.inspect artwork_data
         %__MODULE__{draft | extra: artwork_data}
 
       {:error, message} ->

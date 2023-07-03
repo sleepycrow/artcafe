@@ -500,7 +500,6 @@ defmodule Pleroma.Web.CommonAPI.Utils do
   end
 
   def make_artwork_data(%{title: title} = _artwork_params, attachments) when is_list(attachments) do
-    IO.inspect("-----> INVOKED BASED CLAUSE")
     {:ok, %{
       "type" => "Artwork",
       "name" => title
@@ -508,7 +507,6 @@ defmodule Pleroma.Web.CommonAPI.Utils do
   end
 
   def make_artwork_data(_, _) do
-    IO.inspect("-----> INVOKED SHIT CLAUSE")
     {:ok, %{}}
   end
 end
