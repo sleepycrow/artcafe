@@ -410,7 +410,8 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
         pinned_at: pinned_at
       },
       artcafe: %{
-        is_artwork: artwork?
+        is_artwork: artwork?,
+        title: object.data["name"]
       }
     }
   end
@@ -636,12 +637,6 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
     else
       nil
     end
-  end
-
-  def render_content(%{data: %{"name" => name}} = object) when not is_nil(name) and name != "" do
-    url = object.data["url"] || object.data["id"]
-
-    "<p><a href=\"#{url}\">#{name}</a></p>#{object.data["content"]}"
   end
 
   def render_content(object), do: object.data["content"] || ""

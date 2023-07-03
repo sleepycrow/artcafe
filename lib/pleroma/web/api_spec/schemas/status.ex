@@ -231,6 +231,11 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Status do
             type: :boolean,
             description: "`true`, if the post is actually not a status, but an Artwork object."
           },
+          title: %Schema{
+            type: :string,
+            nullable: true,
+            description: "The title of the status."
+          },
         }
       },
       poll: %Schema{allOf: [Poll], nullable: true, description: "The poll attached to the status"},

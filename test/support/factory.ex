@@ -123,12 +123,13 @@ defmodule Pleroma.Factory do
   end
 
   def artwork_factory(attrs \\ %{}) do
-    text = sequence(:text, &"This is :moominmamma: note #{&1}")
+    text = sequence(:text, &"This is :moominmamma: artwork #{&1}")
 
     user = attrs[:user] || insert(:user)
 
     data = %{
       "type" => "Artwork",
+      "name" => "cool image and picture",
       "content" => text,
       "source" => text,
       "id" => Pleroma.Web.ActivityPub.Utils.generate_object_id(),
