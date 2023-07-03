@@ -227,9 +227,9 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Status do
       artcafe: %Schema{
         type: :object,
         properties: %{
-          is_artwork: %Schema{
-            type: :boolean,
-            description: "`true`, if the post is actually not a status, but an Artwork object."
+          ap_type: %Schema{
+            type: :string,
+            description: "The type of the underlying ActivityPub object."
           },
           title: %Schema{
             type: :string,
@@ -326,7 +326,7 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Status do
           "tags" => []
         },
         "artcafe" => %{
-          "is_artwork" => false
+          "ap_type" => "Note"
         },
         "source" => %{
           "fields" => [],

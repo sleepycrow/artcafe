@@ -336,7 +336,7 @@ defmodule Pleroma.Web.MastodonAPI.StatusViewTest do
         pinned_at: nil
       },
       artcafe: %{
-        is_artwork: false,
+        ap_type: "Note",
         title: nil
       }
     }
@@ -353,7 +353,7 @@ defmodule Pleroma.Web.MastodonAPI.StatusViewTest do
 
     assert Map.has_key?(status, :artcafe)
     assert Map.get(status, :artcafe) == %{
-      is_artwork: true,
+      ap_type: "Artwork",
       title: object_data["name"]
     }
     assert_schema(status, "Status", Pleroma.Web.ApiSpec.spec())

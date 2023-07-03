@@ -358,8 +358,6 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
 
     {pinned?, pinned_at} = pin_data(object, user)
 
-    artwork? = (object.data["type"] == "Artwork")
-
     %{
       id: to_string(activity.id),
       uri: object.data["id"],
@@ -410,7 +408,7 @@ defmodule Pleroma.Web.MastodonAPI.StatusView do
         pinned_at: pinned_at
       },
       artcafe: %{
-        is_artwork: artwork?,
+        ap_type: object.data["type"],
         title: object.data["name"]
       }
     }

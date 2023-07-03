@@ -42,7 +42,7 @@ Has these additional fields under the `pleroma` object:
 
 Has these additional fields under the `artcafe` object:
 
-- `is_artwork`: `true` if the post is actually not a status, but an Artwork object
+- `ap_type`: the type of the underlying ActivityPub object
 - `title`: the title of the status (`name` in the underlying ActivityStreams object)
 
 The `GET /api/v1/statuses/:id/source` endpoint additionally has the following attributes:
