@@ -179,8 +179,8 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
 
   defp artwork(draft) do
     case Utils.make_artwork_data(draft) do
-      {:ok, artwork_data} ->
-        %__MODULE__{draft | extra: artwork_data}
+      {:ok, {artwork_data, artwork_emoji}} ->
+        %__MODULE__{draft | extra: artwork_data, emoji: Map.merge(draft.emoji, artwork_emoji)}
 
       {:error, message} ->
         add_error(draft, message)

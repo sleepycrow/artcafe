@@ -512,13 +512,16 @@ defmodule Pleroma.Web.CommonAPI.Utils do
   end
 
   def make_artwork_data(%{params: %{artwork: %{title: title}}}) do
-    {:ok, %{
+    data = %{
       "type" => "Artwork",
       "name" => title
-    }}
+    }
+    emoji = Pleroma.Emoji.Formatter.get_emoji_map(title)
+
+    {:ok, {data, emoji}}
   end
 
   def make_artwork_data(_) do
-    {:ok, %{}}
+    {:ok, {}}
   end
 end
