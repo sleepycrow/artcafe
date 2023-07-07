@@ -689,7 +689,7 @@ defmodule Pleroma.Web.ApiSpec.StatusOperation do
         title: %Schema{
           type: :string,
           nullable: true,
-          description: "The title of the artwork."
+          description: "The title of the artwork. If passed, the status will become an artwork. Artworks cannot simultaneously be polls, must contain at least 1 attachment and must not be a reply."
         }
       }
     }

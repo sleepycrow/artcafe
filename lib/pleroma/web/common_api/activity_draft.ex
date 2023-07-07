@@ -50,10 +50,10 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
     |> with_valid(&attachments/1)
     |> full_payload()
     |> expires_at()
-    |> extra()
     |> with_valid(&in_reply_to/1)
     |> with_valid(&in_reply_to_conversation/1)
     |> with_valid(&visibility/1)
+    |> extra()
     |> content()
     |> with_valid(&to_and_cc/1)
     |> with_valid(&context/1)
@@ -177,8 +177,8 @@ defmodule Pleroma.Web.CommonAPI.ActivityDraft do
     end
   end
 
-  defp artwork(%{params: %{artwork: artwork_params}} = draft) do
-    case Utils.make_artwork_data(artwork_params, draft.attachments) do
+  defp artwork(draft) do
+    case Utils.make_artwork_data(draft) do
       {:ok, artwork_data} ->
         %__MODULE__{draft | extra: artwork_data}
 

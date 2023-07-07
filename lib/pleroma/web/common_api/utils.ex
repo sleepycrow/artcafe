@@ -495,18 +495,30 @@ defmodule Pleroma.Web.CommonAPI.Utils do
     end
   end
 
-  def make_artwork_data(_artwork_params, [] = _attachments) do
+  def make_artwork_data(%{attachments: []}) do
     {:error, dgettext("errors", "Artwork statuses must have media attachments")}
   end
 
-  def make_artwork_data(%{title: title} = _artwork_params, attachments) when is_list(attachments) do
+  def make_artwork_data(%{in_reply_to: reply_to}) when reply_to != nil do
+    {:error, dgettext("errors", "Artwork statuses cannot be replies")}
+  end
+
+  def make_artwork_data(%{in_reply_to_conversation: reply_to}) when reply_to != nil do
+    {:error, dgettext("errors", "Artwork statuses cannot be replies")}
+  end
+
+  def make_artwork_data(%{visibility: "direct"}) do
+    {:error, dgettext("errors", "Artwork statuses cannot be DMs")}
+  end
+
+  def make_artwork_data(%{params: %{artwork: %{title: title}}}) do
     {:ok, %{
       "type" => "Artwork",
       "name" => title
     }}
   end
 
-  def make_artwork_data(_, _) do
+  def make_artwork_data(_) do
     {:ok, %{}}
   end
 end
