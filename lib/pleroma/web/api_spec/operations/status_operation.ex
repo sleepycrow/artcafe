@@ -636,7 +636,8 @@ defmodule Pleroma.Web.ApiSpec.StatusOperation do
           items: %Schema{type: :string},
           description:
             "A list of nicknames (like `lain@soykaf.club` or `lain` on the local server) that will be used to determine who is going to be addressed by this post. Using this will disable the implicit addressing by mentioned names in the `status` body, only the people in the `to` list will be addressed. The normal rules for for post visibility are not affected by this and will still apply"
-        }
+        },
+        artwork: artwork_params()
       },
       example: %{
         "status" => "What time is it?",
