@@ -791,6 +791,56 @@ defmodule Pleroma.Web.MastodonAPI.StatusControllerTest do
 
       assert %{"error" => "Artwork statuses must have media attachments"} = response
     end
+
+    test "fails if status is a reply", %{user: user, conn: conn} do
+      {:ok, replied_to} = CommonAPI.post(user, %{status: "cofe"})
+
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+
+      {:ok, upload} = ActivityPub.upload(file, actor: user.ap_id)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/statuses", %{
+          "status" => "warrior cat",
+          "artwork" => %{"title" => "epic warrior fanart cats"},
+          "media_ids" => [to_string(upload.id)],
+          "in_reply_to_id" => replied_to.id
+        })
+
+      response = json_response_and_validate_schema(conn, 422)
+
+      assert %{"error" => "Artwork statuses cannot be replies"} = response
+    end
+
+    test "fails if status is a DM", %{user: user, conn: conn} do
+      file = %Plug.Upload{
+        content_type: "image/jpeg",
+        path: Path.absname("test/fixtures/image.jpg"),
+        filename: "an_image.jpg"
+      }
+
+      {:ok, upload} = ActivityPub.upload(file, actor: user.ap_id)
+
+      conn =
+        conn
+        |> put_req_header("content-type", "application/json")
+        |> post("/api/v1/statuses", %{
+          "status" => "warrior cat",
+          "artwork" => %{"title" => "epic warrior fanart cats"},
+          "media_ids" => [to_string(upload.id)],
+          "visibility" => "direct"
+        })
+
+      response = json_response_and_validate_schema(conn, 422)
+
+      assert %{"error" => "Artwork statuses cannot be DMs"} = response
+    end
   end
 
   test "get a status" do
