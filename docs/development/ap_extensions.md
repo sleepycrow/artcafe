@@ -73,4 +73,4 @@ To maintain compatibility with other AP servers, they are converted to `Note`s
 with an extra `intendedType: Artwork` key-value pair when sent, and are converted
 back to `Artwork`s when received.
 
-They are not yet part of any namespace (ooh, that's bad, probably).
+Extra properties are defined in `priv/static/schemas/artcafe-X.X.X.jsonld`.

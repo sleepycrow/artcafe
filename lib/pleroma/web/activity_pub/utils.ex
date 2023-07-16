@@ -114,6 +114,7 @@ defmodule Pleroma.Web.ActivityPub.Utils do
       "@context" => [
         "https://www.w3.org/ns/activitystreams",
         "#{Endpoint.url()}/schemas/litepub-0.1.jsonld",
+        "#{Endpoint.url()}/schemas/artcafe-1.0.0.jsonld",
         %{
           "@language" => "und"
         }

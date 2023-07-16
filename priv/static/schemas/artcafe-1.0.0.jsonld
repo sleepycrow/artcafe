@@ -1,0 +1,6 @@
+{
+    "@context": {
+        "artcafe": "https://joinartcafe.org/ns#",
+        "intendedType": "artcafe:intendedType"
+    }
+}
