@@ -51,7 +51,8 @@ defmodule Pleroma.Constants do
       "Video",
       "Event",
       "Article",
-      "Page"
+      "Page",
+      "Artwork"
     ]
   )
 
