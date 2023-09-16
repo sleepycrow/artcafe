@@ -67,7 +67,7 @@ defmodule Pleroma.Web.MastodonAPI.TimelineController do
     Logger.debug("TimelineController.home: #{nickname} - fetching activities")
 
     activities =
-      [user.ap_id | User.following(user)]
+      [user.ap_id | User.following(user)] ## My AP id and URIs for "followers" collections of all the people I follow
       |> ActivityPub.fetch_activities(params)
       |> Enum.reverse()
 
