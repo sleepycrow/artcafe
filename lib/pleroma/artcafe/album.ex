@@ -32,7 +32,7 @@ defmodule Pleroma.Artcafe.Album do
 
   def changeset(album, attrs \\ %{}) do
     album
-    |> cast(attrs, [:title, :is_public])
+    |> cast(attrs, [:title, :description, :is_public])
     |> validate_required([:title])
   end
 
