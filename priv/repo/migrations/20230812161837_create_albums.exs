@@ -9,6 +9,7 @@ defmodule Pleroma.Repo.Migrations.CreateAlbums do
     create_if_not_exists table(:albums, primary_key: false) do
       add :id, :uuid, primary_key: true
       add :title, :string
+      add :description, :text
       add :is_public, :boolean, default: false
       add :user_id, references(:users, type: :uuid, on_delete: :nothing), null: false
 

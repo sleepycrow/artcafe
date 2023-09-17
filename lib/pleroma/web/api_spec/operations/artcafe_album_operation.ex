@@ -46,6 +46,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
           type: :object,
           properties: %{
             title: %Schema{type: :string, description: "Album title"},
+            description: %Schema{type: :string, description: "Album description"},
             is_public: %Schema{type: :boolean, description: "Whether the list should be public", default: false}
           },
           required: [:title]
@@ -90,6 +91,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
           type: :object,
           properties: %{
             title: %Schema{type: :string, description: "Album title"},
+            description: %Schema{type: :string, description: "Album description"},
             is_public: %Schema{type: :boolean, description: "Whether the list should be public"}
           },
           required: []
@@ -202,10 +204,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       description: "Response schema for albums",
       type: :array,
       items: Album,
-      example: [
-        %{"id" => "2ogB842GmVXw5D0YnWNQYQ", "title" => "Favorites", "is_public" => true},
-        %{"id" => "AYkuNPgUEB8qG2JBHk", "title" => "Best of the best", "is_public" => false}
-      ]
+      example: [Album.schema().example]
     }
   end
 

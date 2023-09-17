@@ -13,6 +13,7 @@ defmodule Pleroma.Artcafe.Album do
   alias Pleroma.Constants
   alias Pleroma.Repo
   alias Pleroma.User
+  alias Pleroma.Activity
 
   require Pleroma.Constants
 
@@ -21,8 +22,10 @@ defmodule Pleroma.Artcafe.Album do
 
   schema "albums" do
     field :title, :string
+    field :description, :string
     field :is_public, :boolean
-    belongs_to(:user, User, type: FlakeId.Ecto.CompatType)
+    belongs_to :user, User, type: FlakeId.Ecto.CompatType
+    many_to_many :activities, Activity, join_through: "album_activity_relationships"
 
     timestamps()
   end
@@ -39,7 +42,8 @@ defmodule Pleroma.Artcafe.Album do
         album in Pleroma.Artcafe.Album,
         where: album.user_id == ^user.id,
         order_by: [desc: album.inserted_at],
-        limit: 50
+        limit: 50,
+        preload: :user
       )
 
     Repo.all(query)
@@ -52,7 +56,8 @@ defmodule Pleroma.Artcafe.Album do
         where: album.user_id == ^user.id,
         where: album.is_public == true,
         order_by: [desc: album.inserted_at],
-        limit: 50
+        limit: 50,
+        preload: :user
       )
 
     Repo.all(query)
@@ -63,7 +68,8 @@ defmodule Pleroma.Artcafe.Album do
       from(
         album in Pleroma.Artcafe.Album,
         where: album.id == ^id,
-        where: album.is_public == true
+        where: album.is_public == true,
+        preload: :user
       )
 
     Repo.one(query)
@@ -74,7 +80,8 @@ defmodule Pleroma.Artcafe.Album do
       from(
         album in Pleroma.Artcafe.Album,
         where: album.id == ^id,
-        where: album.user_id == ^user_id or album.is_public == true
+        where: album.user_id == ^user_id or album.is_public == true,
+        preload: :user
       )
 
     Repo.one(query)
@@ -92,7 +99,11 @@ defmodule Pleroma.Artcafe.Album do
       |> changeset(params)
 
     if changeset.valid? do
-      Repo.insert(changeset)
+      # attempt to add user data to album if successful, otherwise just pass on the result
+      case Repo.insert(changeset) do
+        {:ok, data} -> {:ok, Repo.preload(data, [:user])}
+        result -> result
+      end
     else
       {:error, changeset}
     end

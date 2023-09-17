@@ -7,16 +7,23 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumView do
 
   alias Pleroma.Web.ArtcafeAPI.AlbumView
   alias Pleroma.Web.MastodonAPI.StatusView
+  alias Pleroma.Web.MastodonAPI.AccountView
 
   def render("index.json", %{albums: albums} = opts) do
     render_many(albums, AlbumView, "show.json", opts)
   end
 
-  def render("show.json", %{album: album}) do
+  def render("show.json", %{album: album} = opts) do
     %{
       id: to_string(album.id),
       title: album.title,
-      is_public: album.is_public
+      description: album.description,
+      is_public: album.is_public,
+      account:
+        AccountView.render("show.json", %{
+          user: album.user,
+          for: opts[:for]
+        }),
     }
   end
 
