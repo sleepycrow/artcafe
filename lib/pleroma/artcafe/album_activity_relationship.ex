@@ -16,8 +16,8 @@ defmodule Pleroma.Artcafe.AlbumActivityRelationship do
   @type t :: %__MODULE__{}
 
   schema "album_activity_relationships" do
-    belongs_to(:album, Album, type: FlakeId.Ecto.CompatType)
-    belongs_to(:activity, Activity, type: FlakeId.Ecto.CompatType)
+    belongs_to :album, Album, type: FlakeId.Ecto.CompatType
+    belongs_to :activity, Activity, type: FlakeId.Ecto.CompatType
 
     timestamps()
   end

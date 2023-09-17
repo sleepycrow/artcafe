@@ -35,27 +35,27 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
   defdelegate open_api_operation(action), to: Pleroma.Web.ApiSpec.ArtcafeAlbumOperation
 
   # GET /api/v1/artcafe/albums
-  def index(%{assigns: %{user: user}} = conn, _) do
-    albums = Pleroma.Artcafe.Album.all_for_user(user)
-    render(conn, "index.json", albums: albums)
+  def index(%{assigns: %{user: reading_user}} = conn, _) do
+    albums = Pleroma.Artcafe.Album.all_for_user(reading_user)
+    render(conn, "index.json", albums: albums, for: reading_user)
   end
 
   # POST /api/v1/artcafe/albums
-  def create(%{assigns: %{user: user}, body_params: params} = conn, _) do
-    with {:ok, %Pleroma.Artcafe.Album{} = album} <- Pleroma.Artcafe.Album.create(user, params) do
-      render(conn, "show.json", album: album)
+  def create(%{assigns: %{user: reading_user}, body_params: params} = conn, _) do
+    with {:ok, %Pleroma.Artcafe.Album{} = album} <- Pleroma.Artcafe.Album.create(reading_user, params) do
+      render(conn, "show.json", album: album, for: reading_user)
     end
   end
 
   # GET /api/v1/artcafe/albums/:id
-  def show(%{assigns: %{album: album}} = conn, _) do
-    render(conn, "show.json", album: album)
+  def show(%{assigns: %{user: reading_user, album: album}} = conn, _) do
+    render(conn, "show.json", album: album, for: reading_user)
   end
 
   # PATCH /api/v1/artcafe/albums/:id
-  def update(%{assigns: %{album: album}, body_params: params} = conn, _) do
+  def update(%{assigns: %{user: reading_user, album: album}, body_params: params} = conn, _) do
     with {:ok, album} <- Pleroma.Artcafe.Album.update(album, params) do
-      render(conn, "show.json", album: album)
+      render(conn, "show.json", album: album, for: reading_user)
     else
       _ -> render_error(conn, :internal_server_error, "Unexpected error occurred.")
     end
@@ -75,7 +75,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     with %User{} = user <- User.get_cached_by_nickname_or_id(id, for: reading_user),
          :visible <- User.visible_for(user, reading_user) do
       albums = Pleroma.Artcafe.Album.public_for_user(user)
-      render(conn, "index.json", albums: albums)
+      render(conn, "index.json", albums: albums, for: reading_user)
     else
       _ -> render_error(conn, :not_found, "User not found")
     end
@@ -86,27 +86,23 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     with %Activity{} = activity <- Activity.get_by_id_with_object(activity_id),
          true <- Visibility.visible_for_user?(activity, reading_user) do
       albums = Pleroma.Artcafe.Album.get_user_albums_for_activity(activity_id, reading_user)
-      render(conn, "index.json", albums: albums)
+      render(conn, "index.json", albums: albums, for: reading_user)
     else
       _ -> render_error(conn, :not_found, "Status not found")
     end
   end
 
   # GET /api/v1/artcafe/albums/:id/statuses
-  def get_items(%{assigns: %{user: user, album: album}} = conn, params) do
+  def get_items(%{assigns: %{user: reading_user, album: album}} = conn, params) do
     items =
-      Album.get_items(album, user)
+      Album.get_items(album, reading_user)
       |> Pleroma.Pagination.fetch_paginated(params)
 
     activities = Enum.map(items, fn rel -> rel.activity end)
 
     conn
     |> add_link_headers(items)
-    |> render("content.json",
-      activities: activities,
-      for: user,
-      as: :activity
-    )
+    |> render("content.json", activities: activities, for: reading_user, as: :activity)
   end
 
   # POST /api/v1/artcafe/albums/:id/statuses
@@ -114,7 +110,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     with %Activity{} = activity <- Activity.get_by_id_with_object(activity_id),
          true <- Visibility.visible_for_user?(activity, reading_user),
          {:ok, _} <- AlbumActivityRelationship.create(album.id, activity.id) do
-      json(conn, %{ok: true})
+      json(conn, %{})
       #try_render(conn, "show.json", activity: activity, for: user, as: :activity)
     else
       nil -> render_error(conn, :not_found, "Activity not found")
@@ -127,7 +123,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     with %Activity{} = activity <- Activity.get_by_id_with_object(activity_id),
          true <- Visibility.visible_for_user?(activity, reading_user),
          {:ok, _} <- AlbumActivityRelationship.destroy(album.id, activity.id) do
-      json(conn, %{ok: true})
+      json(conn, %{})
       #try_render(conn, "show.json", activity: activity, for: user, as: :activity)
     else
       nil -> render_error(conn, :not_found, "Activity not found")
@@ -135,17 +131,17 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     end
   end
 
-  defp album_by_id_and_user(%{assigns: %{user: user}, params: %{id: id}} = conn, _) do
-    with %Pleroma.Artcafe.Album{} = album <- Pleroma.Artcafe.Album.get(id, user),
-         true <- Pleroma.Artcafe.Album.is_visible_for?(album, user) do
+  defp album_by_id_and_user(%{assigns: %{user: reading_user}, params: %{id: id}} = conn, _) do
+    with %Pleroma.Artcafe.Album{} = album <- Pleroma.Artcafe.Album.get(id, reading_user),
+         true <- Pleroma.Artcafe.Album.is_visible_for?(album, reading_user) do
       assign(conn, :album, album)
     else
       _ -> render_error(conn, :not_found, "Album not found") |> halt()
     end
   end
 
-  defp requires_album_ownership(%{assigns: %{user: user, album: album}} = conn, _) do
-    case Album.is_owned_by?(album, user) do
+  defp requires_album_ownership(%{assigns: %{user: reading_user, album: album}} = conn, _) do
+    case Album.is_owned_by?(album, reading_user) do
       true -> conn
       false -> render_error(conn, :forbidden, "No permission to edit album") |> halt()
     end
