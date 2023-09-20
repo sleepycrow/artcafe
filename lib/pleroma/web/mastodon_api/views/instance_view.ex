@@ -66,6 +66,7 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
       "multifetch",
       "pleroma:api/v1/notifications:include_types_filter",
       "quote_posting",
+      "artcafe_albums",
       "editing",
       if !Enum.empty?(Config.get([:instance, :local_bubble], [])) do
         "bubble_timeline"
