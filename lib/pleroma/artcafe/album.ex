@@ -63,7 +63,18 @@ defmodule Pleroma.Artcafe.Album do
     Repo.all(query)
   end
 
-  def get(id, nil) do
+  def get_by_id(id) do
+    query =
+      from(
+        album in Pleroma.Artcafe.Album,
+        where: album.id == ^id,
+        preload: :user
+      )
+
+    Repo.one(query)
+  end
+
+  def get_by_id_for_user(id, nil) do
     query =
       from(
         album in Pleroma.Artcafe.Album,
@@ -75,7 +86,7 @@ defmodule Pleroma.Artcafe.Album do
     Repo.one(query)
   end
 
-  def get(id, %{id: user_id} = _user) do
+  def get_by_id_for_user(id, %{id: user_id} = _user) do
     query =
       from(
         album in Pleroma.Artcafe.Album,
@@ -113,7 +124,7 @@ defmodule Pleroma.Artcafe.Album do
     Repo.delete(album)
   end
 
-  def get_items(%Pleroma.Artcafe.Album{} = album, user) do
+  def get_items_for_user(%Pleroma.Artcafe.Album{} = album, user) do
     acceptable_recipients = get_acceptable_recipients_for_user(user)
 
     AlbumActivityRelationship.for_album_query(album.id)
@@ -126,12 +137,12 @@ defmodule Pleroma.Artcafe.Album do
     |> Repo.all()
     |> Enum.map(fn rel -> rel.album end)
   end
-  def get_user_albums_for_status(_, _), do: []
+  def get_user_albums_for_activity(_, _), do: []
 
   def is_owned_by?(%Pleroma.Artcafe.Album{} = album, %User{} = user), do: album.user_id == user.id
   def is_owned_by?(_, _), do: false
 
-  def is_visible_for?(%Pleroma.Artcafe.Album{} = album, %User{} = user), do: is_owned_by?(album, user) or (album.is_public == true)
+  def is_visible_for?(%Pleroma.Artcafe.Album{} = album, user), do: is_owned_by?(album, user) or (album.is_public == true)
   def is_visible_for?(_, _), do: false
 
   defp get_acceptable_recipients_for_user(%User{} = user) do
