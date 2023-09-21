@@ -95,7 +95,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
   # GET /api/v1/artcafe/albums/:id/statuses
   def get_items(%{assigns: %{user: reading_user, album: album}} = conn, params) do
     items =
-      Album.get_items(album, reading_user)
+      Album.get_items_for_user(album, reading_user)
       |> Pleroma.Pagination.fetch_paginated(params)
 
     activities = Enum.map(items, fn rel -> rel.activity end)
@@ -132,7 +132,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
   end
 
   defp album_by_id_and_user(%{assigns: %{user: reading_user}, params: %{id: id}} = conn, _) do
-    with %Pleroma.Artcafe.Album{} = album <- Pleroma.Artcafe.Album.get(id, reading_user),
+    with %Pleroma.Artcafe.Album{} = album <- Pleroma.Artcafe.Album.get_by_id(id),
          true <- Pleroma.Artcafe.Album.is_visible_for?(album, reading_user) do
       assign(conn, :album, album)
     else
