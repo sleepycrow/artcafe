@@ -16,7 +16,7 @@ defmodule Pleroma.Web.ApiSpec.Schemas.Album do
     properties: %{
       id: FlakeID,
       title: %Schema{type: :string, description: "The user-defined title of the album"},
-      description: %Schema{type: :string, description: "The user-defined description of the album"},
+      description: %Schema{type: :string, nullable: true, description: "The user-defined description of the album"},
       is_public: %Schema{type: :boolean, description: "Whether the album is public"},
       account: %Schema{allOf: [Account], description: "The account that created this album"}
     },
