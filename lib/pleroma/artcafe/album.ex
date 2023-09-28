@@ -36,74 +36,6 @@ defmodule Pleroma.Artcafe.Album do
     |> validate_required([:title])
   end
 
-  def all_for_user(user) do
-    query =
-      from(
-        album in Pleroma.Artcafe.Album,
-        where: album.user_id == ^user.id,
-        order_by: [desc: album.inserted_at],
-        limit: 50,
-        preload: :user
-      )
-
-    Repo.all(query)
-  end
-
-  def public_for_user(user) do
-    query =
-      from(
-        album in Pleroma.Artcafe.Album,
-        where: album.user_id == ^user.id,
-        where: album.is_public == true,
-        order_by: [desc: album.inserted_at],
-        limit: 50,
-        preload: :user
-      )
-
-    Repo.all(query)
-  end
-
-  def get_by_id(id) do
-    query =
-      from(
-        album in Pleroma.Artcafe.Album,
-        where: album.id == ^id,
-        preload: :user
-      )
-
-    Repo.one(query)
-  end
-
-  def get_by_id_for_user(id, nil) do
-    query =
-      from(
-        album in Pleroma.Artcafe.Album,
-        where: album.id == ^id,
-        where: album.is_public == true,
-        preload: :user
-      )
-
-    Repo.one(query)
-  end
-
-  def get_by_id_for_user(id, %{id: user_id} = _user) do
-    query =
-      from(
-        album in Pleroma.Artcafe.Album,
-        where: album.id == ^id,
-        where: album.user_id == ^user_id or album.is_public == true,
-        preload: :user
-      )
-
-    Repo.one(query)
-  end
-
-  def update(%Pleroma.Artcafe.Album{} = album, params \\ %{}) do
-    album
-    |> changeset(params)
-    |> Repo.update()
-  end
-
   def create(%User{} = creator, params \\ %{}) do
     changeset =
       %Pleroma.Artcafe.Album{user_id: creator.id}
@@ -120,19 +52,63 @@ defmodule Pleroma.Artcafe.Album do
     end
   end
 
+  def update(%Pleroma.Artcafe.Album{} = album, params \\ %{}) do
+    album
+    |> changeset(params)
+    |> Repo.update()
+  end
+
   def delete(%Pleroma.Artcafe.Album{} = album) do
     Repo.delete(album)
   end
 
-  def get_items_for_user(%Pleroma.Artcafe.Album{} = album, user) do
+  def all_by_user_query(user) do
+    from(
+      album in Pleroma.Artcafe.Album,
+      where: album.user_id == ^user.id,
+      order_by: [desc: album.inserted_at],
+      limit: 50,
+      preload: :user
+    )
+  end
+
+  def all_by_user(user) do
+    all_by_user_query(user)
+    |> Repo.all()
+  end
+
+  def public_by_user(user) do
+    all_by_user_query(user)
+    |> where([album], album.is_public == true)
+    |> Repo.all()
+  end
+
+  def get_by_id(id) do
+    query =
+      from(
+        album in Pleroma.Artcafe.Album,
+        where: album.id == ^id,
+        preload: :user
+      )
+
+    Repo.one(query)
+  end
+
+  def get_items_query(%Pleroma.Artcafe.Album{} = album) do
+    AlbumActivityRelationship.for_album_query(album.id)
+    |> preload([:activity])
+  end
+
+  def get_items_for_user_query(%Pleroma.Artcafe.Album{} = album, user) do
     acceptable_recipients = get_acceptable_recipients_for_user(user)
 
-    AlbumActivityRelationship.for_album_query(album.id)
+    get_items_query(album)
     |> where([_, activity], fragment("? && ?", activity.recipients, ^acceptable_recipients))
   end
 
   def get_user_albums_for_activity(activity_id, %User{} = user) do
     AlbumActivityRelationship.for_activity_query(activity_id)
+    |> preload([:album])
     |> where([_, album], album.user_id == ^user.id)
     |> Repo.all()
     |> Enum.map(fn rel -> rel.album end)
