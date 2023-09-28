@@ -36,7 +36,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
 
   # GET /api/v1/artcafe/albums
   def index(%{assigns: %{user: reading_user}} = conn, _) do
-    albums = Pleroma.Artcafe.Album.all_for_user(reading_user)
+    albums = Pleroma.Artcafe.Album.all_by_user(reading_user)
     render(conn, "index.json", albums: albums, for: reading_user)
   end
 
@@ -74,7 +74,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
   def get_public_albums_for_user(%{assigns: %{user: reading_user}} = conn, %{id: id}) do
     with %User{} = user <- User.get_cached_by_nickname_or_id(id, for: reading_user),
          :visible <- User.visible_for(user, reading_user) do
-      albums = Pleroma.Artcafe.Album.public_for_user(user)
+      albums = Pleroma.Artcafe.Album.public_by_user(user)
       render(conn, "index.json", albums: albums, for: reading_user)
     else
       _ -> render_error(conn, :not_found, "User not found")
@@ -92,10 +92,10 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     end
   end
 
-  # GET /api/v1/artcafe/albums/:id/statuses
+  # GET /api/v1/artcafe/albums/:id/content
   def get_items(%{assigns: %{user: reading_user, album: album}} = conn, params) do
     items =
-      Album.get_items_for_user(album, reading_user)
+      Album.get_items_for_user_query(album, reading_user)
       |> Pleroma.Pagination.fetch_paginated(params)
 
     activities = Enum.map(items, fn rel -> rel.activity end)
@@ -105,7 +105,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     |> render("content.json", activities: activities, for: reading_user, as: :activity)
   end
 
-  # POST /api/v1/artcafe/albums/:id/statuses
+  # POST /api/v1/artcafe/albums/:id/content
   def add_item(%{assigns: %{album: album, user: reading_user}, body_params: %{id: activity_id}} = conn, _) do
     with %Activity{} = activity <- Activity.get_by_id_with_object(activity_id),
          true <- Visibility.visible_for_user?(activity, reading_user),
@@ -118,7 +118,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
     end
   end
 
-  # DELETE /api/v1/artcafe/albums/:id/statuses
+  # DELETE /api/v1/artcafe/albums/:id/content
   def remove_item(%{assigns: %{album: album, user: reading_user}, body_params: %{id: activity_id}} = conn, _) do
     with %Activity{} = activity <- Activity.get_by_id_with_object(activity_id),
          true <- Visibility.visible_for_user?(activity, reading_user),

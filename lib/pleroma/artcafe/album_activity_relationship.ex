@@ -45,7 +45,6 @@ defmodule Pleroma.Artcafe.AlbumActivityRelationship do
       order_by: [desc: r.inserted_at],
       join: activity in Activity,
       on: activity.id == r.activity_id,
-      preload: [activity: activity]
     )
   end
 
@@ -57,12 +56,11 @@ defmodule Pleroma.Artcafe.AlbumActivityRelationship do
       order_by: [desc: r.inserted_at],
       join: album in Album,
       on: album.id == r.album_id,
-      preload: [album: album]
     )
   end
 
   def get(album_id, activity_id) do
-    %Pleroma.Artcafe.AlbumActivityRelationship{}
+    Pleroma.Artcafe.AlbumActivityRelationship
     |> where(album_id: ^album_id)
     |> where(activity_id: ^activity_id)
     |> Repo.one()
