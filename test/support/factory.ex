@@ -775,4 +775,18 @@ defmodule Pleroma.Factory do
     }
     |> Map.merge(params)
   end
+
+  # ArtCafe-related factories below -----------------------------------------------------------------------------------
+
+  def album_factory(attrs \\ %{}) do
+    user = attrs[:user] || insert(:user)
+    should_be_public = Map.get(attrs, :is_public, true)
+
+    %Pleroma.Artcafe.Album{
+      title: "bird album",
+      description: "bird bird bird bird bird",
+      is_public: should_be_public,
+      user_id: user.id
+    }
+  end
 end
