@@ -2,8 +2,6 @@
 # Copyright © 2023 Artcafe Authors <https://joinartcafe.org/>
 # SPDX-License-Identifier: AGPL-3.0-only
 
-#TODO: document (& refine) the responses, they're not accurate
-
 defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
   alias OpenApiSpex.Operation
   alias OpenApiSpex.Reference
@@ -28,7 +26,8 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       security: [%{"oAuth" => ["read:albums"]}],
       operationId: "AlbumController.index",
       responses: %{
-        200 => Operation.response("Array of Album", "application/json", array_of_albums())
+        200 => Operation.response("Array of Album", "application/json", array_of_albums()),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -56,8 +55,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       security: [%{"oAuth" => ["write:albums"]}],
       responses: %{
         200 => Operation.response("Album", "application/json", Album),
-        400 => Operation.response("Error", "application/json", ApiError),
-        404 => Operation.response("Error", "application/json", ApiError)
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -101,7 +99,9 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       security: [%{"oAuth" => ["write:albums"]}],
       responses: %{
         200 => Operation.response("Album", "application/json", Album),
-        422 => Operation.response("Error", "application/json", ApiError)
+        500 => Operation.response("Error", "application/json", ApiError),
+        404 => Operation.response("Error", "application/json", ApiError),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -114,7 +114,10 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       parameters: [album_id_param()],
       security: [%{"oAuth" => ["write:albums"]}],
       responses: %{
-        200 => Operation.response("Empty object", "application/json", %Schema{type: :object})
+        200 => Operation.response("Empty object", "application/json", %Schema{type: :object}),
+        500 => Operation.response("Error", "application/json", ApiError),
+        404 => Operation.response("Error", "application/json", ApiError),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -130,7 +133,8 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
         %Reference{"$ref": "#/components/parameters/accountIdOrNickname"}
       ],
       responses: %{
-        200 => Operation.response("Array of Album", "application/json", array_of_albums())
+        200 => Operation.response("Array of Album", "application/json", array_of_albums()),
+        500 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -149,7 +153,9 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
         )
       ],
       responses: %{
-        200 => Operation.response("Array of Album", "application/json", array_of_albums())
+        200 => Operation.response("Array of Album", "application/json", array_of_albums()),
+        500 => Operation.response("Error", "application/json", ApiError),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -163,7 +169,14 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       parameters: [album_id_param() | pagination_params()],
       security: [%{"oAuth" => ["read:albums"]}],
       responses: %{
-        200 => Operation.response("Status", "application/json", Status)
+        200 => Operation.response("Status", "application/json", %Schema{
+          title: "ArrayOfStatuses",
+          description: "Response schema for get items",
+          type: :array,
+          items: Status,
+          example: [Status.schema().example]
+        }),
+        404 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -178,7 +191,10 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       requestBody: add_remove_item_body(),
       security: [%{"oAuth" => ["write:albums"]}],
       responses: %{
-        200 => Operation.response("Empty object", "application/json", %Schema{type: :object})
+        200 => Operation.response("Empty object", "application/json", %Schema{type: :object}),
+        500 => Operation.response("Error", "application/json", ApiError),
+        404 => Operation.response("Error", "application/json", ApiError),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
@@ -193,7 +209,10 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
       requestBody: add_remove_item_body(),
       security: [%{"oAuth" => ["write:albums"]}],
       responses: %{
-        200 => Operation.response("Empty object", "application/json", %Schema{type: :object})
+        200 => Operation.response("Empty object", "application/json", %Schema{type: :object}),
+        500 => Operation.response("Error", "application/json", ApiError),
+        404 => Operation.response("Error", "application/json", ApiError),
+        403 => Operation.response("Error", "application/json", ApiError)
       }
     }
   end
