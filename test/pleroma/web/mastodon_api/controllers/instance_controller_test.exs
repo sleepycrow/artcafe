@@ -106,4 +106,28 @@ defmodule Pleroma.Web.MastodonAPI.InstanceControllerTest do
              |> get("/api/v1/instance")
              |> json_response_and_validate_schema(200)
   end
+
+  describe "bubble timeline" do
+    test "should show up in features when there are some instances in the local bubble", %{conn: conn} do
+      clear_config([:instance, :local_bubble], ["ashfur-simping.gay", "hawkash.date"])
+
+      %{"pleroma" => %{"metadata" => %{"features" => features}}} =
+        conn
+        |> get("/api/v1/instance")
+        |> json_response_and_validate_schema(200)
+
+      assert Enum.member?(features, "bubble_timeline")
+    end
+
+    test "should not show up in features when there are no instances in the local bubble", %{conn: conn} do
+      clear_config([:instance, :local_bubble], [])
+
+      %{"pleroma" => %{"metadata" => %{"features" => features}}} =
+        conn
+        |> get("/api/v1/instance")
+        |> json_response_and_validate_schema(200)
+
+      refute Enum.member?(features, "bubble_timeline")
+    end
+  end
 end

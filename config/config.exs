@@ -273,7 +273,8 @@ config :pleroma, :instance,
   max_endorsed_users: 20,
   birthday_required: false,
   birthday_min_age: 0,
-  max_media_attachments: 1_000
+  max_media_attachments: 1_000,
+  local_bubble: []
 
 config :pleroma, :welcome,
   direct_message: [
@@ -853,7 +854,7 @@ config :pleroma, :majic_pool, size: 2
 private_instance? = :if_instance_is_private
 
 config :pleroma, :restrict_unauthenticated,
-  timelines: %{local: private_instance?, federated: private_instance?},
+  timelines: %{local: private_instance?, bubble: private_instance?, federated: private_instance?},
   profiles: %{local: private_instance?, remote: private_instance?},
   activities: %{local: private_instance?, remote: private_instance?}
 

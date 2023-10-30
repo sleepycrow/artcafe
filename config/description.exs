@@ -1061,6 +1061,16 @@ config :pleroma, :config_description, [
         suggestions: [
           "en"
         ]
+      },
+      %{
+        key: :local_bubble,
+        type: {:list, :string},
+        description: "List of domains of instances that should appear in the \"Bubble Timeline\". Typically, this would be other instances closely related in subject matter.",
+        suggestions: [
+          "social.lain.com",
+          "cofe.social",
+          "cofe.cafe"
+        ]
       }
     ]
   },

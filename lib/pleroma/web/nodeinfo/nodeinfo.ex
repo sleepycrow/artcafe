@@ -73,7 +73,8 @@ defmodule Pleroma.Web.Nodeinfo.Nodeinfo do
         mailerEnabled: Config.get([Pleroma.Emails.Mailer, :enabled], false),
         features: features,
         restrictedNicknames: Config.get([Pleroma.User, :restricted_nicknames]),
-        skipThreadContainment: Config.get([:instance, :skip_thread_containment], false)
+        skipThreadContainment: Config.get([:instance, :skip_thread_containment], false),
+        localBubbleInstances: Config.get([:instance, :local_bubble], [])
       }
     }
   end
