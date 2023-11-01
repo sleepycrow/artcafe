@@ -44,7 +44,7 @@ defmodule Pleroma.Artcafe.AlbumActivityRelationship do
       where: r.album_id == ^album_id,
       order_by: [desc: r.inserted_at],
       join: activity in Activity,
-      on: activity.id == r.activity_id,
+      on: activity.id == r.activity_id
     )
   end
 
@@ -55,7 +55,7 @@ defmodule Pleroma.Artcafe.AlbumActivityRelationship do
       where: r.activity_id == ^activity_id,
       order_by: [desc: r.inserted_at],
       join: album in Album,
-      on: album.id == r.album_id,
+      on: album.id == r.album_id
     )
   end
 
