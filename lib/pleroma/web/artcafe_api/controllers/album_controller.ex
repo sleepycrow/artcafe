@@ -6,8 +6,7 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
   use Pleroma.Web, :controller
 
   import Pleroma.Web.TranslationHelpers
-  import Pleroma.Web.ControllerHelper,
-    only: [try_render: 3, add_link_headers: 2]
+  import Pleroma.Web.ControllerHelper, only: [add_link_headers: 2]
 
   alias Pleroma.User
   alias Pleroma.Activity
@@ -111,7 +110,6 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
          true <- Visibility.visible_for_user?(activity, reading_user),
          {:ok, _} <- AlbumActivityRelationship.create(album.id, activity.id) do
       json(conn, %{})
-      #try_render(conn, "show.json", activity: activity, for: user, as: :activity)
     else
       nil -> render_error(conn, :not_found, "Activity not found")
       _ -> render_error(conn, :internal_server_error, "Unexpected error occurred.")
@@ -124,7 +122,6 @@ defmodule Pleroma.Web.ArtcafeAPI.AlbumController do
          true <- Visibility.visible_for_user?(activity, reading_user),
          {:ok, _} <- AlbumActivityRelationship.destroy(album.id, activity.id) do
       json(conn, %{})
-      #try_render(conn, "show.json", activity: activity, for: user, as: :activity)
     else
       nil -> render_error(conn, :not_found, "Activity not found")
       _ -> render_error(conn, :internal_server_error, "Unexpected error occurred.")
