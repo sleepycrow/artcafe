@@ -527,7 +527,7 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
         |> assign(:token, insert(:oauth_token, user: user_two, scopes: ["read:statuses"]))
 
       # Only direct should be visible here
-      res_conn = get(conn_user_two, "api/v1/timelines/direct")
+      res_conn = get(conn_user_two, "/api/v1/timelines/direct")
 
       assert [status] = json_response_and_validate_schema(res_conn, :ok)
 
@@ -539,14 +539,14 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
         build_conn()
         |> assign(:user, user_one)
         |> assign(:token, insert(:oauth_token, user: user_one, scopes: ["read:statuses"]))
-        |> get("api/v1/timelines/direct")
+        |> get("/api/v1/timelines/direct")
 
       [status] = json_response_and_validate_schema(res_conn, :ok)
 
       assert %{"visibility" => "direct"} = status
 
       # Both should be visible here
-      res_conn = get(conn_user_two, "api/v1/timelines/home")
+      res_conn = get(conn_user_two, "/api/v1/timelines/home")
 
       [_s1, _s2] = json_response_and_validate_schema(res_conn, :ok)
 
@@ -559,14 +559,14 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
           })
       end)
 
-      res_conn = get(conn_user_two, "api/v1/timelines/direct")
+      res_conn = get(conn_user_two, "/api/v1/timelines/direct")
 
       statuses = json_response_and_validate_schema(res_conn, :ok)
       assert length(statuses) == 20
 
       max_id = List.last(statuses)["id"]
 
-      res_conn = get(conn_user_two, "api/v1/timelines/direct?max_id=#{max_id}")
+      res_conn = get(conn_user_two, "/api/v1/timelines/direct?max_id=#{max_id}")
 
       assert [status] = json_response_and_validate_schema(res_conn, :ok)
 
@@ -591,7 +591,7 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
           visibility: "direct"
         })
 
-      res_conn = get(conn, "api/v1/timelines/direct")
+      res_conn = get(conn, "/api/v1/timelines/direct")
 
       [status] = json_response_and_validate_schema(res_conn, :ok)
       assert status["id"] == direct.id
@@ -1032,6 +1032,34 @@ defmodule Pleroma.Web.MastodonAPI.TimelineControllerTest do
       assert length(json_response_and_validate_schema(res_conn, 200)) == 2
 
       ensure_authenticated_access(base_uri)
+    end
+  end
+
+  describe "bubble" do
+    setup do: oauth_access(["n/a"])
+
+    test "should display local posts, and posts from instances in the local bubble", %{conn: conn} do
+      clear_config([:instance, :local_bubble], ["ashfur.gay"])
+
+      local_user = insert(:user, %{ap_id: "https://localhost/users/user"})
+      remote_user1 = insert(:user, %{ap_id: "https://ashfur.gay/users/remote_user"})
+      remote_user2 = insert(:user, %{ap_id: "https://cringe.lol/users/remote_user"})
+
+      {:ok, local_activity} = CommonAPI.post(local_user, %{status: "Status"})
+      remote_activity1 = create_remote_activity(remote_user1)
+      remote_activity2 = create_remote_activity(remote_user2)
+      remote_activity3 = create_remote_activity(remote_user1)
+
+      all_ids =
+        conn
+        |> get("/api/v1/timelines/bubble")
+        |> json_response_and_validate_schema(:ok)
+        |> Enum.map(& &1["id"])
+
+      assert remote_activity3.id in all_ids
+      assert remote_activity1.id in all_ids
+      assert local_activity.id in all_ids
+      refute remote_activity2.id in all_ids
     end
   end
 

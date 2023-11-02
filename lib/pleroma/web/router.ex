@@ -786,6 +786,7 @@ defmodule Pleroma.Web.Router do
 
     get("/timelines/public", TimelineController, :public)
     get("/timelines/tag/:tag", TimelineController, :hashtag)
+    get("/timelines/bubble", TimelineController, :bubble)
 
     get("/polls/:id", PollController, :show)
 

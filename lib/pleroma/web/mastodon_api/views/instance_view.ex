@@ -103,6 +103,9 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
         "profile_directory"
       end,
       "pleroma:get:main/ostatus",
+      if !Enum.empty?(Config.get([:instance, :local_bubble], [])) do
+        "bubble_timeline"
+      end
     ]
     |> Enum.filter(& &1)
   end

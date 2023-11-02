@@ -127,6 +127,37 @@ defmodule Pleroma.Web.MastodonAPI.TimelineController do
     end
   end
 
+  # GET /api/v1/timelines/bubble
+  def bubble(%{assigns: %{user: user}} = conn, params) do
+    local_bubble = Enum.uniq(
+      [Pleroma.Web.Endpoint.host() | Config.get([:instance, :local_bubble], [])]
+    )
+
+    if is_nil(user) and Config.restrict_unauthenticated_access?(:timelines, :bubble) do
+      fail_on_bad_auth(conn)
+    else
+      activities =
+        params
+        |> Map.put(:type, ["Create"])
+        |> Map.put(:blocking_user, user)
+        |> Map.put(:muting_user, user)
+        |> Map.put(:reply_filtering_user, user)
+        |> Map.put(:instance, local_bubble)
+        # Restricts unfederated content to authenticated users
+        |> Map.put(:includes_local_public, not is_nil(user))
+        |> ActivityPub.fetch_public_activities()
+
+      conn
+      |> add_link_headers(activities)
+      |> render("index.json",
+        activities: activities,
+        for: user,
+        as: :activity,
+        with_muted: Map.get(params, :with_muted, false)
+      )
+    end
+  end
+
   defp fail_on_bad_auth(conn) do
     render_error(conn, :unauthorized, "authorization required for timeline view")
   end

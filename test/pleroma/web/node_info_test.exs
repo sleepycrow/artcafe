@@ -285,5 +285,17 @@ defmodule Pleroma.Web.NodeInfoTest do
 
       assert response["metadata"]["federation"]["mrf_simple_info"] == expected_config
     end
+
+    test "shows local bubble instances", %{ conn: conn } do
+      expected_bubble_instances = ["ashfur-simping.gay", "hawkash.date"]
+      clear_config([:instance, :local_bubble], expected_bubble_instances)
+
+      %{"metadata" => %{"localBubbleInstances" => bubble_instances}} =
+        conn
+        |> get("/nodeinfo/2.1.json")
+        |> json_response(:ok)
+
+      assert bubble_instances == expected_bubble_instances
+    end
   end
 end
