@@ -52,7 +52,7 @@ defmodule Pleroma.Web.MastodonAPI.TimelineController do
       |> Map.delete(:local)
 
     activities =
-      [user.ap_id | User.following(user)]
+      [user.ap_id | User.following(user)] ## My AP id and URIs for "followers" collections of all the people I follow
       |> ActivityPub.fetch_activities(params)
       |> Enum.reverse()
 

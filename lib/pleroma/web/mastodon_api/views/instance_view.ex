@@ -70,6 +70,7 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
       "pleroma:api/v1/notifications:include_types_filter",
       "editing",
       "quote_posting",
+      "artcafe_albums",
       if Config.get([:activitypub, :blockers_visible]) do
         "blockers_visible"
       end,
@@ -101,7 +102,7 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
       if Config.get([:instance, :profile_directory]) do
         "profile_directory"
       end,
-      "pleroma:get:main/ostatus"
+      "pleroma:get:main/ostatus",
     ]
     |> Enum.filter(& &1)
   end

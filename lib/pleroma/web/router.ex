@@ -612,6 +612,26 @@ defmodule Pleroma.Web.Router do
     end
   end
 
+  scope "/api/v1/artcafe", Pleroma.Web.ArtcafeAPI do
+    pipe_through(:api)
+
+    get("/albums/:id", AlbumController, :show)
+    get("/albums/:id/content", AlbumController, :get_items)
+    get("/accounts/:id/albums", AlbumController, :get_public_albums_for_user)
+    get("/statuses/:id/albums", AlbumController, :get_user_albums_for_status)
+  end
+
+  scope "/api/v1/artcafe", Pleroma.Web.ArtcafeAPI do
+    pipe_through(:authenticated_api)
+
+    get("/albums", AlbumController, :index)
+    post("/albums", AlbumController, :create)
+    patch("/albums/:id", AlbumController, :update)
+    delete("/albums/:id", AlbumController, :delete)
+    post("/albums/:id/content", AlbumController, :add_item)
+    delete("/albums/:id/content", AlbumController, :remove_item)
+  end
+
   scope "/api/v1", Pleroma.Web.MastodonAPI do
     pipe_through(:authenticated_api)
 

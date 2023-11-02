@@ -1,0 +1,132 @@
+# Artcafe: Pleroma's dA-browsing, hawkash-shipping younger sister
+# Copyright © 2023 Artcafe Authors <https://joinartcafe.org/>
+# SPDX-License-Identifier: AGPL-3.0-only
+
+defmodule Pleroma.Artcafe.Album do
+  use Ecto.Schema
+
+  import Pleroma.Web.ActivityPub.Utils, only: [as_local_public: 0]
+  import Ecto.Query
+  import Ecto.Changeset
+
+  alias Pleroma.Artcafe.AlbumActivityRelationship
+  alias Pleroma.Constants
+  alias Pleroma.Repo
+  alias Pleroma.User
+  alias Pleroma.Activity
+
+  require Pleroma.Constants
+
+  @type t :: %__MODULE__{}
+  @primary_key {:id, FlakeId.Ecto.CompatType, autogenerate: true}
+
+  schema "albums" do
+    field :title, :string
+    field :description, :string
+    field :is_public, :boolean
+    belongs_to :user, User, type: FlakeId.Ecto.CompatType
+    many_to_many :activities, Activity, join_through: "album_activity_relationships"
+
+    timestamps()
+  end
+
+  def changeset(album, attrs \\ %{}) do
+    album
+    |> cast(attrs, [:title, :description, :is_public])
+    |> validate_required([:title])
+  end
+
+  def create(%User{} = creator, params \\ %{}) do
+    changeset =
+      %Pleroma.Artcafe.Album{user_id: creator.id}
+      |> changeset(params)
+
+    if changeset.valid? do
+      # attempt to add user data to album if successful, otherwise just pass on the result
+      case Repo.insert(changeset) do
+        {:ok, data} -> {:ok, Repo.preload(data, [:user])}
+        result -> result
+      end
+    else
+      {:error, changeset}
+    end
+  end
+
+  def update(%Pleroma.Artcafe.Album{} = album, params \\ %{}) do
+    album
+    |> changeset(params)
+    |> Repo.update()
+  end
+
+  def delete(%Pleroma.Artcafe.Album{} = album) do
+    Repo.delete(album)
+  end
+
+  def all_by_user_query(user) do
+    from(
+      album in Pleroma.Artcafe.Album,
+      where: album.user_id == ^user.id,
+      order_by: [desc: album.inserted_at],
+      limit: 50,
+      preload: :user
+    )
+  end
+
+  def all_by_user(user) do
+    all_by_user_query(user)
+    |> Repo.all()
+  end
+
+  def public_by_user(user) do
+    all_by_user_query(user)
+    |> where([album], album.is_public == true)
+    |> Repo.all()
+  end
+
+  def get_by_id(id) do
+    query =
+      from(
+        album in Pleroma.Artcafe.Album,
+        where: album.id == ^id,
+        preload: :user
+      )
+
+    Repo.one(query)
+  end
+
+  def get_items_query(%Pleroma.Artcafe.Album{} = album) do
+    AlbumActivityRelationship.for_album_query(album.id)
+    |> preload([:activity])
+  end
+
+  def get_items_for_user_query(%Pleroma.Artcafe.Album{} = album, user) do
+    acceptable_recipients = get_acceptable_recipients_for_user(user)
+
+    get_items_query(album)
+    |> where([_, activity], fragment("? && ?", activity.recipients, ^acceptable_recipients))
+  end
+
+  def get_user_albums_for_activity(activity_id, %User{} = user) do
+    AlbumActivityRelationship.for_activity_query(activity_id)
+    |> preload([:album])
+    |> where([_, album], album.user_id == ^user.id)
+    |> Repo.all()
+    |> Enum.map(fn rel -> rel.album end)
+  end
+  def get_user_albums_for_activity(_, _), do: []
+
+  def is_owned_by?(%Pleroma.Artcafe.Album{} = album, %User{} = user), do: album.user_id == user.id
+  def is_owned_by?(_, _), do: false
+
+  def is_visible_for?(%Pleroma.Artcafe.Album{} = album, user), do: is_owned_by?(album, user) or (album.is_public == true)
+  def is_visible_for?(_, _), do: false
+
+  defp get_acceptable_recipients_for_user(%User{} = user) do
+    get_acceptable_recipients_for_user(nil)
+    |> Enum.concat([user.ap_id | User.following(user)])
+  end
+
+  defp get_acceptable_recipients_for_user(_) do
+    [Constants.as_public(), as_local_public()]
+  end
+end
