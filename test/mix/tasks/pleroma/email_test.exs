@@ -81,8 +81,8 @@ defmodule Mix.Tasks.Pleroma.EmailTest do
 
       ObanHelpers.perform_all()
 
-      assert_email_sent(to: {local_user1.name, local_user1.email})
-      assert_email_sent(to: {local_user2.name, local_user2.email})
+      assert_email_sent(to: [{local_user1.name, local_user1.email}])
+      assert_email_sent(to: [{local_user2.name, local_user2.email}])
     end
 
     test "Does not send confirmation email to inappropriate users" do
