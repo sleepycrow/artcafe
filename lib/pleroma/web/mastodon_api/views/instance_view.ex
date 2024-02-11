@@ -40,6 +40,7 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
       background_image: Pleroma.Web.Endpoint.url() <> Keyword.get(instance, :background_image),
       shout_limit: Config.get([:shout, :limit]),
       description_limit: Keyword.get(instance, :description_limit),
+      chat_limit: Keyword.get(instance, :chat_limit),
       pleroma: pleroma_configuration(instance)
     })
   end
@@ -129,7 +130,8 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
       "pleroma:get:main/ostatus",
       if !Enum.empty?(Config.get([:instance, :local_bubble], [])) do
         "bubble_timeline"
-      end
+      end,
+      "pleroma:group_actors"
     ]
     |> Enum.filter(& &1)
   end
@@ -225,6 +227,7 @@ defmodule Pleroma.Web.MastodonAPI.InstanceView do
           banner_upload_limit: Keyword.get(instance, :banner_upload_limit),
           background_image:
             Pleroma.Web.Endpoint.url() <> Keyword.get(instance, :background_image),
+          chat_limit: Keyword.get(instance, :chat_limit),
           description_limit: Keyword.get(instance, :description_limit),
           shout_limit: Config.get([:shout, :limit])
         })
