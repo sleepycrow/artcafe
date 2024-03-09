@@ -162,7 +162,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
 
   def get_items_operation do
     %Operation{
-      tags: ["Albums"],
+      tags: ["Album content"],
       summary: "Get activities in album",
       description: "Gets the activities in a given",
       operationId: "AlbumController.get_items",
@@ -183,7 +183,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
 
   def add_item_operation do
     %Operation{
-      tags: ["Albums"],
+      tags: ["Album content"],
       summary: "Add activity to album",
       description: "Adds the specified activity to an album owned by you",
       operationId: "AlbumController.add_item",
@@ -201,7 +201,7 @@ defmodule Pleroma.Web.ApiSpec.ArtcafeAlbumOperation do
 
   def remove_item_operation do
     %Operation{
-      tags: ["Albums"],
+      tags: ["Album content"],
       summary: "Add activity to album",
       description: "Adds the specified activity to an album owned by you",
       operationId: "AlbumController.remove_item",

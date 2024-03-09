@@ -126,7 +126,8 @@ defmodule Pleroma.Web.ApiSpec do
               "Status actions"
             ]
           },
-          %{"name" => "Miscellaneous", "tags" => ["Emoji packs", "Reports", "Suggestions"]}
+          %{"name" => "Miscellaneous", "tags" => ["Emoji packs", "Reports", "Suggestions"]},
+          %{"name" => "Albums", "tags" => ["Albums", "Album content"]}
         ]
       }
     }
