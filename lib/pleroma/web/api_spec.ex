@@ -141,6 +141,13 @@ defmodule Pleroma.Web.ApiSpec do
             ]
           },
           %{
+            "name" => "Albums",
+            "tags" => [
+              "Albums",
+              "Album content"
+            ]
+          },
+          %{
             "name" => "Miscellaneous",
             "tags" => [
               "Emoji packs",
