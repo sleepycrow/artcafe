@@ -1,4 +1,4 @@
-# Artcafe: Pleroma's dA-browsing, hawkash-shipping younger sister
+# Artcafe: Akkoma's dA-browsing, hawkash-shipping younger sister
 # Copyright © 2023 Artcafe Authors <https://joinartcafe.org/>
 # SPDX-License-Identifier: AGPL-3.0-only
 

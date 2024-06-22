@@ -2,6 +2,10 @@
 # Copyright © 2017-2021 Pleroma Authors <https://pleroma.social/>
 # SPDX-License-Identifier: AGPL-3.0-only
 
+# Artcafe: Akkoma's dA-browsing, hawkash-shipping younger sister
+# Copyright © 2023 Artcafe Authors <https://joinartcafe.org/>
+# SPDX-License-Identifier: AGPL-3.0-only
+
 defmodule Pleroma.Factory do
   use ExMachina.Ecto, repo: Pleroma.Repo
 
